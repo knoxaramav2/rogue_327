@@ -22,7 +22,7 @@ Dungeon * generateDungeon(){
         locations[i] = malloc(3);
         locations[i][0] = (rand()%(DUNGEON_WIDTH-6)) + 3;
         locations[i][1] = (rand()%(DUNGEON_HEIGHT-6)) + 3;
-        locations[i][2] = (rand()%8)+3;
+        locations[i][2] = (rand()%MAX_ROOM_SIZE)+MIN_ROOM_SIZE;
 
         printf("At %d %d x %d \r\n", locations[i][0], locations[i][1], locations[i][2]);
 
@@ -43,8 +43,8 @@ Dungeon * generateDungeon(){
         printf("%d - %d x %d - %d\r\n", xMin, xMax, yMin, yMax);
 
         int h, v;
-        for (h=xMin; h<xMax; ++h){
-            for (v=yMin; v<yMax; ++v){
+        for (h=xMin; h<=xMax; ++h){
+            for (v=yMin; v<=yMax; ++v){
                 dungeon->screen[CELL(h, v)] = OPEN_SPACE;
             }
 
