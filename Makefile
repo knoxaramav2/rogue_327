@@ -1,10 +1,10 @@
 #compile nqueens (+ GDB data)
 
 CC = gcc
-CFLAGS = -std=c11 -g
+CFLAGS = -std=c11 -g -Iutil
 OUT = dungeon
 CLEANTXT = *.o *.a *.exe
-SRC = dungeon.c
+SRC = launcher.c generators.c
 
 ifeq ($(shell uname), Linux)
 	RUNPATH = $(OUT)
