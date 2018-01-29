@@ -1,0 +1,3 @@
+Generates a dungeon with 5-7 rooms.
+
+Still working out a good process for creating rooms without a lot of waste loops.
