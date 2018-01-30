@@ -32,10 +32,14 @@ int renderScreen(Dungeon * dungeon){
         if (i % DUNGEON_WIDTH == 0){
             printf("\r\n");
         }
-        int cell = (i%(DUNGEON_WIDTH)) + ((i/DUNGEON_WIDTH) * DUNGEON_WIDTH);
-        printf("%c", (char) dungeon->screen[i]);
+        unsigned cell = (i%(DUNGEON_WIDTH)) + ((i/DUNGEON_WIDTH) * DUNGEON_WIDTH);
+        //if (getMutable(cell) == 0) printf("!"); else
+        //printf("%c", (char) dungeon->screen[i]);
+        printf("%c", dungeon->screen[cell]);
+        //printf("%u", getImmutable(dungeon->screen[cell]));
     }
 
     //render text below
     printf("\n|\n|\n|\r\n");
+    fflush(stdout);
 }

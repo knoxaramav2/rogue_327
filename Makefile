@@ -4,7 +4,7 @@ CC = gcc
 CFLAGS = -std=c11 -g -Iutil
 OUT = dungeon
 CLEANTXT = *.o *.a *.exe
-SRC = launcher.c generators.c dungeon.c console.c
+SRC = launcher.c generators.c dungeon.c console.c algo.c
 
 ifeq ($(shell uname), Linux)
 	RUNPATH = $(OUT)

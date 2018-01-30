@@ -1,3 +1,6 @@
 1/23/18 Dungeon generator
 1/29/18 Moved into git repo: https://github.com/knoxaramav2/rogue_327
 1/29/18 Refactored into multiple files
+1/29/18 Get/Set cell attributes
+1/30/18 Better room generation
+1/30/18 Hallways, better room generation

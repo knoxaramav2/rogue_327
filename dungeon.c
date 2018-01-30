@@ -16,13 +16,13 @@ unsigned setHardness(unsigned cell, unsigned hardness){
     return setAttribute(cell, (hardness << HARD_OFFSET) & HARD_MASK);
 }
 
-unsigned getMutable(unsigned cell){
-    return (cell & MUTABLE_MASK) >> MUTABLE_OFFSET;
+unsigned getImmutable(unsigned cell){
+    return (cell & IMMUTABLE_MASK) >> MUTABLE_OFFSET;
 }
 
-unsigned setMutable(unsigned cell, unsigned mutable){
+unsigned setImmutable(unsigned cell, unsigned immutable){
 
-    setAttribute(cell, MUTABLE_MASK * (mutable != 0));
+    setAttribute(cell, IMMUTABLE_MASK * (immutable != 0));
 }
 
 char getSymbol(unsigned cell){

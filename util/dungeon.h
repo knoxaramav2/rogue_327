@@ -5,6 +5,9 @@
 
 typedef struct Dungeon{
     unsigned * screen;
+
+    int ** roomInfo;
+    int roomCount;
 } Dungeon;
 
 Dungeon * generateDungeon();
@@ -12,8 +15,8 @@ Dungeon * generateDungeon();
 //Attributes
 unsigned getHardness(unsigned cell);
 unsigned setHardness(unsigned cell, unsigned hardness);
-unsigned getMutable(unsigned cell);
-unsigned setMutable(unsigned cell, unsigned mutable);
+unsigned getImmutable(unsigned cell);
+unsigned setImmutable(unsigned cell, unsigned immutable);
 char getSymbol(unsigned cell);
 char setSymbol(unsigned cell, char symbol);
 
