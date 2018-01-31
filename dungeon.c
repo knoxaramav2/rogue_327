@@ -1,5 +1,19 @@
+#include <stdlib.h>
+#include <string.h>
+
 #include "dungeon.h"
 #include "defs.h"
+
+Dungeon * createDungeon(){
+
+    Dungeon * dungeon  = malloc(sizeof(Dungeon));
+    dungeon->screen = malloc((DUNGEON_WIDTH * DUNGEON_HEIGHT) * sizeof(unsigned));
+    memset(dungeon->screen, setHardness(ROCK_SPACE, 50), (DUNGEON_WIDTH * DUNGEON_HEIGHT) * sizeof(unsigned));//generate empty dungeon
+    dungeon->roomCount = 0;
+    dungeon->roomInfo = 0;
+
+    return dungeon;
+}
 
 //Attributes
 unsigned setAttribute(unsigned cell, unsigned mask){

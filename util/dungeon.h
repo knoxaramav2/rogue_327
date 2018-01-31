@@ -10,6 +10,7 @@ typedef struct Dungeon{
     int roomCount;
 } Dungeon;
 
+Dungeon * createDungeon();
 Dungeon * generateDungeon();
 
 //Attributes

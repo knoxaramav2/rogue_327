@@ -16,10 +16,10 @@
 
 //bit masks
 #define SYMBOL_MASK     0x0000FFFF
-#define HARD_MASK       0x00070000
-#define IMMUTABLE_MASK  0x00080000
+#define HARD_MASK       0x00FF0000
+#define IMMUTABLE_MASK  0x00FF0000
 
 #define HARD_OFFSET     16
-#define MUTABLE_OFFSET  19
+#define MUTABLE_OFFSET  16
 
 #endif

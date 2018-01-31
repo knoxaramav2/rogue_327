@@ -1,3 +1,18 @@
-Generates a dungeon with 5-7 rooms.
+Generates a dungeon with 5-12 rooms with a size between 3-15 in each direction.
 
-Still working out a good process for creating rooms without a lot of waste loops.
+Command line arguments are:
+    -h          help
+    -s          save
+    -l          load
+    --save      save
+    --load      load
+
+Switches preceeded by a single dash may be stacked, ig. -sl to save and load.
+
+Currently, there are a couple bug to work out; while saves and loads are consistent,
+the map generated is illegible normally, but a map is visible when inverted (as it currently is)
+and so I suspect that there might be something wrong how hardness is encoded, probably
+an off by one error.
+
+Secondly, the corridor algorithm is off by one, not quite touching its end node,
+and occasionally a room is left by itself.

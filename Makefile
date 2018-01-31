@@ -23,6 +23,6 @@ clean:
 
 .PHONY: run
 run:
-	./$(RUNPATH) -h
+	./$(RUNPATH) -l
 		
 

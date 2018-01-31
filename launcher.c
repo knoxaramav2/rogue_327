@@ -75,9 +75,6 @@ void cmd(int argc, char ** argv){
             }
         }
     }
-
-
-
 }
 
 //UTIL
@@ -99,23 +96,19 @@ int main(int argc, char ** argv){
         dungeon = loadGame();
     } else {
         dungeon = generateDungeon();
-        if (dungeon == 0){
-            printf("Unable to generate dungeon\r\n");
-        return -1;
-        }
     }
 
+        if (dungeon == 0){
+            printf("Unable to get dungeon\r\n");
+            return -1;
+        }
+
     //play game
+    renderScreen(dungeon);
 
     if (config.save){
         saveGame(dungeon);
     }
-
-    
-
-
-
-    renderScreen(dungeon);
 
     return 0;
 }

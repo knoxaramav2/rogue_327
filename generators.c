@@ -300,11 +300,15 @@ int generateCorridors(Dungeon * d){
 
 Dungeon * generateDungeon(){
     //Generate rock map
-    Dungeon * dungeon = malloc(sizeof(Dungeon));
-    dungeon->screen = malloc((DUNGEON_WIDTH * DUNGEON_HEIGHT) * sizeof(unsigned));
-    memset(dungeon->screen, setHardness(ROCK_SPACE, 3), (DUNGEON_WIDTH * DUNGEON_HEIGHT) * sizeof(unsigned));//generate empty dungeon
-    dungeon->roomCount = 0;
-    dungeon->roomInfo = 0;
+    Dungeon * dungeon = createDungeon();
+
+    //randomize rock hardness
+    {
+        int hi = 0;
+        for (; hi < DUNGEON_WIDTH * DUNGEON_HEIGHT; ++hi){
+            dungeon->screen[hi] = setHardness(dungeon->screen[hi], randIn(5, 200));
+        }
+    }
 
     //set immutable border
     int bx = 0;
