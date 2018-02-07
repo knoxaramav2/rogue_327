@@ -33,11 +33,17 @@ int renderScreen(Dungeon * dungeon){
             printf("\r\n");
         }
         unsigned cell = (i%(DUNGEON_WIDTH)) + ((i/DUNGEON_WIDTH) * DUNGEON_WIDTH);
-        //if (getMutable(cell) == 0) printf("!"); else
-        //printf("%c", (char) dungeon->screen[i]);
-        printf("%c", dungeon->screen[cell]);
-        //printf("%u", getImmutable(dungeon->screen[cell]));
+        Entity * player = dungeon->player;
+
+        if (CELL(player->x, player->y) == cell){
+            printf("@");
+        } else {
+            printf("%c", dungeon->screen[cell]);
+        }
     }
+
+    //render actors
+
 
     //render text below
     printf("\n|\n|\n|\r\n");

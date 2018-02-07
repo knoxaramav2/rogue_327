@@ -132,7 +132,7 @@ Dungeon * loadGame(){
 
     int i = 0;
     for (; i < DUNGEON_HEIGHT * DUNGEON_WIDTH; ++i){    
-        unsigned type = hardness[i] == 0 ? ROCK_SPACE : OPEN_SPACE;
+        unsigned type = hardness[i] == 0 ? HALL_SPACE : ROCK_SPACE;
         d->screen[i] = setHardness(type, hardness[i]);
     }
 
@@ -143,9 +143,9 @@ Dungeon * loadGame(){
 
     while((nRead = fread(buf[rooms], 1, 4, f)) > 0){
 
-        int l=0;
-        for (; l < 4; ++l)printf("%u %u %u %u", buf[rooms][l]);
-        printf("\r\n");
+        //int l=0;
+        //for (; l < 4; ++l)printf("%u %u %u %u", buf[rooms][l]);
+        //printf("\r\n");
 
         ++rooms;
     }
@@ -154,6 +154,7 @@ Dungeon * loadGame(){
 
     //load room data
     d->roomInfo = malloc(sizeof(int *) * rooms);
+    d->roomCount = rooms;
 
     for (i=0; i < rooms; ++i){
         d->roomInfo[i] = malloc(sizeof(int) * 4);
@@ -162,8 +163,29 @@ Dungeon * loadGame(){
         d->roomInfo[i][1] = buf[i][0];
         d->roomInfo[i][2] = buf[i][3];
         d->roomInfo[i][3] = buf[i][2];
-    }
 
+        //populate with floor space
+        int x = buf[i][1];
+        int y = buf[i][0];
+        int sx = buf[i][3];
+        int sy = buf[i][2];
+
+        int ix = 0;
+        int iy = 0;
+
+        for (ix = x; ix < x+sx; ++ix){
+            for (iy = y; iy < y+sy; ++iy){
+                d->screen[CELL(ix, iy)] = OPEN_SPACE;
+            }
+        }
+
+        //d->screen[i] = setHardness(type, hardness[i]);
+
+        printf("Load Room %d : (%d, %d) [%d x %d]\r\n", 
+            i+1, 
+            buf[i][1], buf[i][0],
+            buf[i][3], buf[i][2]);
+    }
 
     return d;
 }
@@ -192,10 +214,15 @@ void saveGame(Dungeon * d){
         }
 
         for(i=0; i<d->roomCount; ++i){
-            fputc((unsigned char)d->roomInfo[i][1], f);
-            fputc((unsigned char)d->roomInfo[i][0], f);
-            fputc((unsigned char)d->roomInfo[i][3], f);
-            fputc((unsigned char)d->roomInfo[i][2], f);
+            fputc((unsigned char)d->roomInfo[i][1], f);//y
+            fputc((unsigned char)d->roomInfo[i][0], f);//x
+            fputc((unsigned char)d->roomInfo[i][3], f);//size y
+            fputc((unsigned char)d->roomInfo[i][2], f);//size x
+
+            printf("Save Room %d : (%d, %d) [%d x %d]\r\n", 
+                i+1, 
+                d->roomInfo[i][1], d->roomInfo[i][0],
+                d->roomInfo[i][3], d->roomInfo[i][2]);
         }
     }
 

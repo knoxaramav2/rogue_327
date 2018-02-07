@@ -15,4 +15,5 @@ and so I suspect that there might be something wrong how hardness is encoded, pr
 an off by one error.
 
 Secondly, the corridor algorithm is off by one, not quite touching its end node,
-and occasionally a room is left by itself.
+and occasionally a room is left by itself. I wanted to make a fancy new path finding
+algorithm, probably just gonna go with dijkstra's or a* instead. 

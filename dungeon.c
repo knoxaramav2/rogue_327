@@ -8,9 +8,11 @@ Dungeon * createDungeon(){
 
     Dungeon * dungeon  = malloc(sizeof(Dungeon));
     dungeon->screen = malloc((DUNGEON_WIDTH * DUNGEON_HEIGHT) * sizeof(unsigned));
+    dungeon->_distanceMap = malloc((DUNGEON_WIDTH * DUNGEON_HEIGHT) * sizeof(unsigned));
     memset(dungeon->screen, setHardness(ROCK_SPACE, 50), (DUNGEON_WIDTH * DUNGEON_HEIGHT) * sizeof(unsigned));//generate empty dungeon
     dungeon->roomCount = 0;
     dungeon->roomInfo = 0;
+    dungeon->player = 0;
 
     return dungeon;
 }

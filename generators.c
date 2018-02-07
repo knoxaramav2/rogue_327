@@ -349,6 +349,14 @@ Dungeon * generateDungeon(){
 
     generateCorridors(dungeon);
 
+    //place player in room
+    int rId = randIn(0, dungeon->roomCount);
+    int * roomSet = dungeon->roomInfo[rId];
+    int xLoc = roomSet[0] + (roomSet[2] / 2 );
+    int yLoc = roomSet[1] + (roomSet[3] / 2);
+
+    dungeon->player = createEntity(1, xLoc, yLoc);
+
     //renderScreen(dungeon);
     //fflush(stdout);
 

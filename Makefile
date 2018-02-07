@@ -4,7 +4,7 @@ CC = gcc
 CFLAGS = -std=c11 -g -Iutil
 OUT = dungeon
 CLEANTXT = *.o *.a *.exe
-SRC = launcher.c generators.c dungeon.c console.c algo.c file.c
+SRC = launcher.c generators.c dungeon.c console.c algo.c file.c entity.c
 
 ifeq ($(shell uname), Linux)
 	RUNPATH = $(OUT)
@@ -23,6 +23,6 @@ clean:
 
 .PHONY: run
 run:
-	./$(RUNPATH) -l
+	./$(RUNPATH)
 		
 
