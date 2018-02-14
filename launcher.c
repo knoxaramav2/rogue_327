@@ -9,6 +9,7 @@
 #include "console.h"
 #include "config.h"
 #include "fileIO.h"
+#include "algo.h"
 
 Config config;
 
@@ -98,10 +99,12 @@ int main(int argc, char ** argv){
         dungeon = generateDungeon();
     }
 
-        if (dungeon == 0){
-            printf("Unable to get dungeon\r\n");
-            return -1;
-        }
+    if (dungeon == 0){
+        printf("Unable to get dungeon\r\n");
+        return -1;
+    }
+
+    calcDistMap(dungeon, 0);
 
     //play game
     renderScreen(dungeon);

@@ -3,6 +3,8 @@
         "string.h": "c",
         "stdlib.h": "c",
         "dungeon.h": "c",
-        "defs.h": "c"
+        "defs.h": "c",
+        "math.h": "c",
+        "algo.h": "c"
     }
 }

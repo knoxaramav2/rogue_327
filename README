@@ -9,11 +9,5 @@ Command line arguments are:
 
 Switches preceeded by a single dash may be stacked, ig. -sl to save and load.
 
-Currently, there are a couple bug to work out; while saves and loads are consistent,
-the map generated is illegible normally, but a map is visible when inverted (as it currently is)
-and so I suspect that there might be something wrong how hardness is encoded, probably
-an off by one error.
-
-Secondly, the corridor algorithm is off by one, not quite touching its end node,
-and occasionally a room is left by itself. I wanted to make a fancy new path finding
-algorithm, probably just gonna go with dijkstra's or a* instead. 
+Generates a player '@' in the center of a random room.
+Fixed some previous save/load bugs.

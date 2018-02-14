@@ -4,8 +4,9 @@
 #include "dungeon.h"
 
 typedef struct QueueNode{
-    int val;
-    struct QueueNode * next;
+    int dist;
+    int id;
+    struct QueueNode * next, * prev;
 } QueueNode;
 
 typedef struct Queue{
@@ -13,13 +14,7 @@ typedef struct Queue{
     QueueNode * head, * tail;
 } Queue;
 
-Queue * createQueue();
-void clearQueue(Queue * q);
-int addToQueue(Queue * q, int val);
-int removeFromQueue(Queue * q, int * val);
-int peekQueue(Queue * q, int * val);
-
-void calcDistMap(Dungeon * d, int x, int y);
+void calcDistMap(Dungeon * d, int allowTunnel);
 int randIn(int min, int max);
 
 #endif

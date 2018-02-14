@@ -5,6 +5,7 @@
 
 #include "fileIO.h"
 #include "defs.h"
+#include "algo.h"
 
 unsigned long calculateFileSize(Dungeon * d){
     return 1700 + (4 * d->roomCount);
@@ -186,6 +187,14 @@ Dungeon * loadGame(){
             buf[i][1], buf[i][0],
             buf[i][3], buf[i][2]);
     }
+
+    //place player in room
+    int rId = randIn(0, d->roomCount);
+    int * roomSet = d->roomInfo[rId];
+    int xLoc = roomSet[0] + (roomSet[2] / 2 );
+    int yLoc = roomSet[1] + (roomSet[3] / 2);
+
+    d->player = createEntity(1, xLoc, yLoc);
 
     return d;
 }
