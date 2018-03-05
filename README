@@ -6,8 +6,26 @@ Command line arguments are:
     -l          load
     --save      save
     --load      load
+    --nummon [integer]
 
 Switches preceeded by a single dash may be stacked, ig. -sl to save and load.
 
 Generates a player '@' in the center of a random room.
 Fixed some previous save/load bugs.
+
+NOTE: Memory bug in path finder, causes pointer corruption when memory is freed
+
+PATH FINDER:
+The Dijkstra's implementation uses a min-heap in the form of a linked list, as well as
+an associated array that describes if a cell has been visited, as well as making it easier 
+to check neighboring nodes. See dungeon.c
+
+Player movement:
+WASD keys
+
+Monster movement:
+Currently uses distance map and moves towards lowest weight. Odd bug where monsters teleport
+into the corner or move too quickly towards the player.
+
+Events:
+A priority queue is added too, popped and updated with each action executed. See game.c

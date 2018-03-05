@@ -5,6 +5,12 @@
 
 #define CELL(x,y) ((x%DUNGEON_WIDTH) + (y*DUNGEON_WIDTH))
 
+#define ROOM_XPOS_I   0
+#define ROOM_YPOS_I   1
+#define ROOM_WIDTH_I  2
+#define ROOM_HEIGHT_I 3
+
+
 typedef struct Dungeon{
     unsigned * screen;
     unsigned * _distanceMap;
@@ -13,6 +19,7 @@ typedef struct Dungeon{
     int roomCount;
 
     Entity * player;
+    Entity ** npcs;
 } Dungeon;
 
 Dungeon * createDungeon();

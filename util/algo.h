@@ -16,5 +16,8 @@ typedef struct Queue{
 
 void calcDistMap(Dungeon * d, int allowTunnel);
 int randIn(int min, int max);
+int getY(int i);
+int getX(int i);
+int getAdjacentIndex(int x, int y, int i);
 
 #endif

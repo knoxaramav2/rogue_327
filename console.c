@@ -1,8 +1,30 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "config.h"
 #include "console.h"
+#include "algo.h"
 #include "defs.h"
+
+Config config;
+
+int getLastDigit(unsigned v){
+    return v%10;
+}
+
+char hasMonster(Dungeon * d, int idx){
+    int x = getX(idx);
+    int y = getY(idx);
+
+    int i = 0;
+    for (; i < config.numNpc; ++i){
+        if (x == d->npcs[i]->x && y == d->npcs[i]->y){
+            return d->npcs[i]->symbol;
+        }
+    }
+
+    return 0;
+}
 
 int printBoarder(){
     int i = 1;
@@ -35,8 +57,12 @@ int renderScreen(Dungeon * dungeon){
         unsigned cell = (i%(DUNGEON_WIDTH)) + ((i/DUNGEON_WIDTH) * DUNGEON_WIDTH);
         Entity * player = dungeon->player;
 
-        if (CELL(player->x, player->y) == cell){
-            printf("@");
+        char monster = hasMonster(dungeon, i);
+
+        if (monster){
+            printf("\x1B[31m%c\x1B[0m", monster);
+        } else if (CELL(player->x, player->y) == cell){
+            printf("\x1B[32m@\x1B[0m");
         } else {
             printf("%c", dungeon->screen[cell]);
         }
@@ -50,7 +76,7 @@ int renderScreen(Dungeon * dungeon){
     fflush(stdout);
 }
 
-int renderDistance(Dungeon * dungeon){
+int renderDistance(Dungeon * dungeon, int allowTunnel){
 
     printBoarder();
 
@@ -62,10 +88,17 @@ int renderDistance(Dungeon * dungeon){
         unsigned cell = (i%(DUNGEON_WIDTH)) + ((i/DUNGEON_WIDTH) * DUNGEON_WIDTH);
         Entity * player = dungeon->player;
 
-        if (CELL(player->x, player->y) == cell){
-            printf("@");
+        char monster = hasMonster(dungeon, i);
+        
+        if (monster){
+            printf("\x1B[31m%c\x1B[0m", monster);
+        } else if (CELL(player->x, player->y) == cell){
+            printf("\x1B[32m@\x1B[0m");
         } else {
-            printf("%c", dungeon->screen[cell]);
+            if (allowTunnel == 0 && getHardness(dungeon->screen[cell]) > 1)
+                printf(" ");
+            else
+                printf("%d", getLastDigit(dungeon->_distanceMap[cell]));
         }
     }
 

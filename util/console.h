@@ -5,6 +5,7 @@
 
 int clearScreen();
 int renderScreen(Dungeon * dungeon);
-int renderDistance(Dungeon * dungeon);
+int renderDistance(Dungeon * dungeon, int);
+int getLastDigit(unsigned);
 
 #endif

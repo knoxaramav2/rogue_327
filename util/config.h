@@ -6,6 +6,8 @@ typedef struct Config {
     int save;
 
     int _run;
+
+    int numNpc;
 } Config;
 
 extern Config config;

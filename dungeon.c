@@ -3,6 +3,9 @@
 
 #include "dungeon.h"
 #include "defs.h"
+#include "config.h"
+
+Config config;
 
 Dungeon * createDungeon(){
 
@@ -13,6 +16,7 @@ Dungeon * createDungeon(){
     dungeon->roomCount = 0;
     dungeon->roomInfo = 0;
     dungeon->player = 0;
+    dungeon->npcs = malloc(config.numNpc * sizeof(Entity*));
 
     return dungeon;
 }

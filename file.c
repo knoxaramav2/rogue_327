@@ -194,7 +194,7 @@ Dungeon * loadGame(){
     int xLoc = roomSet[0] + (roomSet[2] / 2 );
     int yLoc = roomSet[1] + (roomSet[3] / 2);
 
-    d->player = createEntity(1, xLoc, yLoc);
+    d->player = createEntity('@', xLoc, yLoc, 0);
 
     return d;
 }

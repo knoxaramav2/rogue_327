@@ -6,9 +6,11 @@
 #include "dungeon.h"
 #include "algo.h"
 #include "math.h"
+#include "config.h"
 
 #include "console.h"
 
+Config config;
 
 typedef struct Coord{
     int x, y;
@@ -105,12 +107,12 @@ int calculateRooms(Dungeon * dungeon){
         roomAttempts = 0;
         while(roomAttempts < 100){
             //choose room size
-            dungeon->roomInfo[i][2] = randIn(MIN_ROOM_SIZE, MAX_ROOM_SIZE);
-            dungeon->roomInfo[i][3] = randIn(MIN_ROOM_SIZE, MAX_ROOM_SIZE);
+            dungeon->roomInfo[i][ROOM_WIDTH_I] = randIn(MIN_ROOM_SIZE, MAX_ROOM_SIZE);
+            dungeon->roomInfo[i][ROOM_HEIGHT_I] = randIn(MIN_ROOM_SIZE, MAX_ROOM_SIZE);
 
             //choose room location within possible areas
-            dungeon->roomInfo[i][0] = randIn(1, (DUNGEON_WIDTH - 1) - dungeon->roomInfo[i][2]);
-            dungeon->roomInfo[i][1] = randIn(1, (DUNGEON_HEIGHT - 1) - dungeon->roomInfo[i][3]);
+            dungeon->roomInfo[i][ROOM_XPOS_I] = randIn(1, (DUNGEON_WIDTH - 1) - dungeon->roomInfo[i][ROOM_WIDTH_I]);
+            dungeon->roomInfo[i][ROOM_YPOS_I] = randIn(1, (DUNGEON_HEIGHT - 1) - dungeon->roomInfo[i][ROOM_HEIGHT_I]);
 
             if (checkRoomCollide(dungeon->roomInfo, i) == 0){
                 break;
@@ -172,6 +174,8 @@ int generateCorridors(Dungeon * d){
         int * target;
 
         host = d->roomInfo[rIdx];
+
+        //Choose rooms to connect
         do{
             hIdx = randIn(0, d->roomCount-1);
             target = d->roomInfo[hIdx];
@@ -189,10 +193,10 @@ int generateCorridors(Dungeon * d){
             int dir = rand()%4;
 
             switch(dir){
-            case 0: x = host[0] - 1;                break;
-                case 1: x = host[0] + host[2] + 1;  break;
-                case 2: y = host[1] - 1;            break;
-                case 3: y = host[1] + host[3] + 1;  break;
+                case 0: x = host[ROOM_XPOS_I] - 1;                break;
+                case 1: x = host[ROOM_XPOS_I] + host[ROOM_WIDTH_I] + 1;  break;
+                case 2: y = host[ROOM_YPOS_I] - 1;            break;
+                case 3: y = host[ROOM_YPOS_I] + host[ROOM_HEIGHT_I] + 1;  break;
             }
 
             doorLoc[0][0] = x;
@@ -203,8 +207,8 @@ int generateCorridors(Dungeon * d){
 
             //target
             do{
-            x = randIn(target[0], target[0] + target[2]);
-            y = randIn(target[1], target[1] + target[3]);
+            x = randIn(target[ROOM_XPOS_I], target[ROOM_XPOS_I] + target[ROOM_WIDTH_I]);
+            y = randIn(target[ROOM_YPOS_I], target[ROOM_YPOS_I] + target[ROOM_HEIGHT_I]);
             int dir = rand()%4;
 
             switch(dir){
@@ -256,15 +260,15 @@ int generateCorridors(Dungeon * d){
                 fromy = next.y;
             }
 
-            x = fromx;
-            y = fromy;
+            x = fromx-1;
+            y = fromy-1;
 
-            for (; x < tox; ++x){
+            for (; x <= tox; ++x){
                 if (getSymbol(d->screen[CELL(x, y)]) != OPEN_SPACE)
                     d->screen[CELL(x, y)] = setHardness(HALL_SPACE, 0);
             }
 
-            for (--x; y < toy; ++y){
+            for (--x; y <= toy; ++y){
                 if (getSymbol(d->screen[CELL(x, y)]) != OPEN_SPACE)
                     d->screen[CELL(x, y)] = setHardness(HALL_SPACE, 0);
             }
@@ -349,13 +353,40 @@ Dungeon * generateDungeon(){
 
     generateCorridors(dungeon);
 
+    /*
     //place player in room
     int rId = randIn(0, dungeon->roomCount);
     int * roomSet = dungeon->roomInfo[rId];
     int xLoc = roomSet[0] + (roomSet[2] / 2 );
     int yLoc = roomSet[1] + (roomSet[3] / 2);
 
-    dungeon->player = createEntity(1, xLoc, yLoc);
+    dungeon->player = createEntity('@', xLoc, yLoc, 0);
+
+    //randomly place monster
+    for (i=0; i<config.numNpc; ++i){
+        int mx=-1, my;
+        do{
+            mx = randIn(0, DUNGEON_WIDTH);
+            my = randIn(0, DUNGEON_HEIGHT);
+
+            unsigned open = getSymbol(dungeon->screen[CELL(mx, my)]);
+            if (open == ROCK_SPACE)
+                mx = -1;
+        } while (mx < 0);
+
+        //determine npcs type
+        char sym = randIn(0, 4);
+        switch(sym){
+            case 0: sym='p'; break;
+            case 1: sym='P'; break;
+            case 2: sym='d'; break;
+            case 3: sym='s'; break;
+        }
+
+        printf("%c at %d %d\r\n", sym, mx, my);
+
+        dungeon->npcs[i] = createEntity(sym, mx, my, 1);
+    }*/
 
     //renderScreen(dungeon);
     //fflush(stdout);

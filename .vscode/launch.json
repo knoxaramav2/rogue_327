@@ -6,7 +6,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/dungeon.exe",
-            "args": ["-ls"],
+            "args": ["--nummon", "8"],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}",
             "environment": [],

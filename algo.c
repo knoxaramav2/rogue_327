@@ -1,17 +1,40 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "algo.h"
+#include "console.h"
 
 #include "defs.h"
 
-
-int getX(int i){
-    return i % DUNGEON_WIDTH;
+int getY(int i){
+    return i / DUNGEON_WIDTH;
 }
 
-int getY(int i){
-    return i / DUNGEON_HEIGHT;
+int getX(int i){
+    return i - ((i/DUNGEON_WIDTH) * DUNGEON_WIDTH);
+}
+
+int getAdjacentIndex(int x, int y, int i){
+
+    int dx, dy;
+
+    switch (i){
+        case 0: dx = x-1; dy = y-1; break;
+        case 1: dx = x; dy = y-1; break;
+        case 2: dx = x+1; dy = y-1; break;
+        case 3: dx = x-1; dy = y; break;
+        case 4: dx = x+1; dy = y; break;
+        case 5: dx = x-1; dy = y+1; break;
+        case 6: dx = x; dy = y+1; break;
+        case 7: dx = x+1; dy = y+1; break;
+        default: return -1;
+    }
+
+    if (dx < 0 || dx >= DUNGEON_WIDTH || dy < 0 || dy >= DUNGEON_HEIGHT)
+        return -1;
+
+   return CELL(dx, dy);
 }
 
 //QUEUE
@@ -26,16 +49,19 @@ Queue * createQueue(){
 }
 
 void swapLeft(Queue * q, QueueNode * n){
+
+        if (n->prev == 0)
+            return;
+
         QueueNode * l = n->prev;
         QueueNode * r = n->next;
+        QueueNode * lp = l->prev;
 
-        //Swap left
-        if (l->prev){
-            l->prev->next = n;
-            n->prev = l->prev->next;
+        if (lp){
+            lp->next = n;
+            n->prev = lp;
         } else {
             n->prev = 0;
-            q->head = n;
         }
 
         if (r){
@@ -43,16 +69,29 @@ void swapLeft(Queue * q, QueueNode * n){
             l->next = r;
         } else {
             l->next = 0;
-            q->tail = l;
         }
 
-        l->prev = n;
         n->next = l;
+        l->prev = n;
 }
 
 void bubbleNode(Queue * q, QueueNode * n){
-    while(n->prev != 0 && n->prev->dist < n->dist){
+
+    if (n->prev < 5000){
+        return;
+    }
+
+    if (n->next == 0){
+        q->tail = n->prev;
+    }
+
+    while(n->prev != 0 && n->prev->dist > n->dist){
         swapLeft(q, n);
+        //printf("Swapped %d @ %d for %d @ %d\r\n", n->id, n->dist, n->next->id, n->next->dist);
+    }
+
+    if (n->prev == 0){
+        q->head = n;
     }
 }
 
@@ -72,44 +111,42 @@ QueueNode * addToQueue(Queue * q, int id){
         q->tail = n;
     }
 
+    ++q->size;
+
     return n;
 }
 
 int isEmpty(Queue * q){
-    return q->size > 0;
+    return q->size == 0;
 }
 
-int getAdjacentWeight(Dungeon * d, int x, int y, int i){
-    int coord = CELL(x, y);
+int getAdjacentWeight(unsigned * grid, int x, int y, int i){
 
-    int dx, dy;
+    int c = getAdjacentIndex(x, y, i);
 
-    switch (i){
-        case 0: dx = x-1; y-1; break;
-        case 1: dx = x; y-1; break;
-        case 2: dx = x+1; y-1; break;
-        case 3: dx = x-1; y; break;
-        case 4: dx = x+1; y; break;
-        case 5: dx = x-1; y+1; break;
-        case 6: dx = x; y+1; break;
-        case 7: dx = x+1; y+1; break;
-        default: return -1;
-    }
+    if (c<0) return -1;
 
-    int c = CELL(dx, dy);
-    if (c<0 || c>DUNGEON_HEIGHT * DUNGEON_WIDTH)
-        return -1;
-
-    return getHardness(d->screen[CELL(x, y)]);
+    return getHardness(grid[c]);
 }
 
 int popQueue(Queue * q){
 
-    q->head->next->prev = 0;
+    if (q->size == 0)
+        return 0;
+
+    --q->size;
+    
     QueueNode * h = q->head->next;
-    free(q->head);
+
+    if (h == 0){
+        return 0;
+    }
+
+    h->prev = 0;
+    //free(q->head);
     q->head = h;
-    q->head->prev = 0;
+
+    
 
     return 0;
 }
@@ -152,22 +189,55 @@ void calcDistMap(Dungeon * d, int allowTunnel){
         }
     }
 
+    QueueNode * u = peekNode(q);
+    int tx=0;
+
     while (!isEmpty(q)){
 
-        QueueNode * u = peekNode(q);
-
+        //examine neighbors
         i = 0;
+        int lowestIdx = 0;
+        int lowestVal = 255;
+        int currDist = u->dist;
         for (; i < 8; ++i){
 
-            int w = getAdjacentWeight(d getX(u->id), getY(u->id), i);
+            int ax = getX(u->id);
+            int ay = getY(u->id);
+            int aIdx = getAdjacentIndex(ax, ay, i);
+            QueueNode * qn = qArr[aIdx];
 
-            /*if (){
-                
-            }*/
+            if (qn == 0 || aIdx < 0) continue; //not available
+
+            if (getSymbol(d->screen[aIdx]) == ROCK_SPACE){
+                printf("%c", getSymbol(d->screen[aIdx]));
+            }
+
+            int adjWght = getSymbol(d->screen[aIdx]) == ROCK_SPACE ? getHardness(d->screen[aIdx]) : 1;
+            int adjDist;
+            if (qArr[aIdx]){
+                adjDist = qArr[aIdx]->dist;
+            } else {
+                continue;
+            }
+
+             int newDist = adjWght + currDist;
+
+            if(newDist < adjDist || adjDist == 255){
+                d->_distanceMap[aIdx] = newDist;
+                qn->dist = newDist; 
+
+                if (newDist < lowestVal){
+                    lowestVal = newDist;
+                    lowestIdx = i;
+                }
+
+                bubbleNode(q, qArr[aIdx]);
+            }
         }
-
+        
         popQueue(q);
-
+        qArr[u->id] = 0;
+        u = peekNode(q);
     }
 
     //generate heap
