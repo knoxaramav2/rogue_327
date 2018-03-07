@@ -22,6 +22,7 @@ to check neighboring nodes. See dungeon.c
 
 Player movement:
 WASD keys
+'q' quits game
 
 Monster movement:
 Currently uses distance map and moves towards lowest weight. Odd bug where monsters teleport

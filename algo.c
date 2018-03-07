@@ -15,19 +15,26 @@ int getX(int i){
     return i - ((i/DUNGEON_WIDTH) * DUNGEON_WIDTH);
 }
 
+/*
+Direction codes
+
+5 6 7
+3   4
+0 1 2
+*/
 int getAdjacentIndex(int x, int y, int i){
 
     int dx, dy;
 
     switch (i){
-        case 0: dx = x-1; dy = y-1; break;
-        case 1: dx = x; dy = y-1; break;
-        case 2: dx = x+1; dy = y-1; break;
-        case 3: dx = x-1; dy = y; break;
-        case 4: dx = x+1; dy = y; break;
-        case 5: dx = x-1; dy = y+1; break;
-        case 6: dx = x; dy = y+1; break;
-        case 7: dx = x+1; dy = y+1; break;
+        case BOTTOM_LEFT: dx = x-1; dy = y-1; break;
+        case BOTTOM_MIDDLE: dx = x; dy = y-1; break;
+        case BOTTOM_RIGHT: dx = x+1; dy = y-1; break;
+        case MIDDLE_LEFT: dx = x-1; dy = y; break;
+        case MIDDLE_RIGHT: dx = x+1; dy = y; break;
+        case TOP_LEFT: dx = x-1; dy = y+1; break;
+        case TOP_MIDDLE: dx = x; dy = y+1; break;
+        case TOP_RIGHT: dx = x+1; dy = y+1; break;
         default: return -1;
     }
 

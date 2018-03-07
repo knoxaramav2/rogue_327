@@ -72,7 +72,7 @@ int renderScreen(Dungeon * dungeon){
 
 
     //render text below
-    printf("\n|\n|\n|\r\n");
+    printf("\r\n|\r\n|\r\n|\r\n");
     fflush(stdout);
 }
 

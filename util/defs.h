@@ -13,6 +13,8 @@
 #define OPEN_SPACE      '.'
 #define ROCK_SPACE      ' '
 #define HALL_SPACE      '#'
+#define UP_STAIRS       '<'
+#define DOWN_STAIRS     '>'
 
 //bit masks
 #define SYMBOL_MASK     0x0000FFFF
@@ -21,5 +23,30 @@
 
 #define HARD_OFFSET     16
 #define MUTABLE_OFFSET  16
+
+
+//key values
+#define BOTTOM_LEFT     0
+#define BOTTOM_MIDDLE   1
+#define BOTTOM_RIGHT    2
+#define MIDDLE_LEFT     3
+#define MIDDLE_RIGHT    4
+#define TOP_LEFT        5
+#define TOP_MIDDLE      6
+#define TOP_RIGHT       7
+
+#define MOVE_LOWER      10
+#define MOVE_UPPER      11
+#define REST_TURN       12
+
+#define LIST_MONSTERS   20
+
+#define SCROLL_UP       30
+#define SCROLL_DOWN     31
+
+#define ESCAPE          40
+
+#define QUIT_GAME       50
+#define INVALID_KEY     -1
 
 #endif

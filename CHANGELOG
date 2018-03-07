@@ -15,3 +15,9 @@
 2/20/18 Monster generation
 2/20/18 Monster movement, bug fixes, bugs created
 3/5/18  Better macros, small bug fixes
+3/5/18  Think the pathways failing to connect works now
+3/5/18  Flush STDIN to prevent accidental moves
+3/5/18  Fixed tunneling. Probably.
+3/6/18  Added ncurses, switched unbuffered input to ncurses
+3/6/18  Added windows(cygwin) Unix getch compatibility
+3/7/18  Fixed movement

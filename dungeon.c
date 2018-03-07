@@ -22,10 +22,10 @@ Dungeon * createDungeon(){
 }
 
 //Attributes
-unsigned setAttribute(unsigned cell, unsigned mask){
+unsigned setAttribute(unsigned cell, unsigned value, unsigned mask){
     //clear current attribute
     cell &= ~mask;
-    return cell | mask;
+    return cell | value;
 }
 
 unsigned getHardness(unsigned cell){
@@ -33,7 +33,7 @@ unsigned getHardness(unsigned cell){
 }
 
 unsigned setHardness(unsigned cell, unsigned hardness){
-    return setAttribute(cell, (hardness << HARD_OFFSET) & HARD_MASK);
+    return setAttribute(cell, (hardness << HARD_OFFSET) & HARD_MASK, HARD_MASK);
 }
 
 unsigned getImmutable(unsigned cell){
@@ -42,7 +42,7 @@ unsigned getImmutable(unsigned cell){
 
 unsigned setImmutable(unsigned cell, unsigned immutable){
 
-    setAttribute(cell, IMMUTABLE_MASK * (immutable != 0));
+    setAttribute(cell, IMMUTABLE_MASK * (immutable != 0), IMMUTABLE_MASK);
 }
 
 char getSymbol(unsigned cell){

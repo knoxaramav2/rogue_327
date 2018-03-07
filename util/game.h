@@ -12,5 +12,7 @@ typedef struct TurnItem{
 void setupGameState(Dungeon * d);
 void spawnPlayers(Dungeon * d);
 void updateTurn(Dungeon * d);
+Entity * attack(Entity * attacker, Dungeon *d);
+void moveByStrategy(Entity * e, Dungeon * d, int *toX, int *toY);
 
 #endif

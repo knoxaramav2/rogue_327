@@ -138,6 +138,42 @@ int calculateRooms(Dungeon * dungeon){
     return numRooms;
 }
 
+int getRandomRoomSpace(int * roomInfo){
+    int rWidth  = roomInfo  [ROOM_WIDTH_I];
+    int rHeight = roomInfo  [ROOM_HEIGHT_I];
+    int rX      = roomInfo  [ROOM_XPOS_I];
+    int rY      = roomInfo  [ROOM_YPOS_I];
+
+    int rangeX = randIn(rX, rX+rWidth);
+    int rangeY = randIn(rY, rY+rHeight);
+
+    return CELL(rangeX, rangeY);
+}
+
+void generateStairs(Dungeon * d){
+
+    int roomCount = d->roomCount;
+    int upStairs = randIn(1, roomCount);
+    int downStairs = randIn(1, roomCount);
+
+    int rooms = 0;
+
+    //create up stairs
+    for (int i = 0; i < upStairs/2; ++i){
+        int roomIdx = randIn(0, roomCount-1);
+        int stairIdx = getRandomRoomSpace(d->roomInfo[roomIdx]);
+        d->screen[stairIdx] = setSymbol(d->screen[stairIdx], UP_STAIRS);
+    }
+
+    //create down stairs
+    for (int i = 0; i < downStairs/2; ++i){
+        int roomIdx = randIn(0, roomCount-1);
+        int stairIdx = getRandomRoomSpace(d->roomInfo[roomIdx]);
+        d->screen[stairIdx] = setSymbol(d->screen[stairIdx], DOWN_STAIRS);
+    }
+
+}
+
 /*
     Corridor generation
 
@@ -193,10 +229,10 @@ int generateCorridors(Dungeon * d){
             int dir = rand()%4;
 
             switch(dir){
-                case 0: x = host[ROOM_XPOS_I] - 1;                break;
-                case 1: x = host[ROOM_XPOS_I] + host[ROOM_WIDTH_I] + 1;  break;
-                case 2: y = host[ROOM_YPOS_I] - 1;            break;
-                case 3: y = host[ROOM_YPOS_I] + host[ROOM_HEIGHT_I] + 1;  break;
+                case 0: x = host[ROOM_XPOS_I];                break;
+                case 1: x = host[ROOM_XPOS_I] + host[ROOM_WIDTH_I];  break;
+                case 2: y = host[ROOM_YPOS_I];            break;
+                case 3: y = host[ROOM_YPOS_I] + host[ROOM_HEIGHT_I];  break;
             }
 
             doorLoc[0][0] = x;
@@ -352,6 +388,7 @@ Dungeon * generateDungeon(){
     }
 
     generateCorridors(dungeon);
+    generateStairs(dungeon);
 
     /*
     //place player in room

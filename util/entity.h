@@ -10,6 +10,7 @@ typedef struct Entity{
 
     char symbol;
     int x, y;
+    int lastPcX, lastPcY;
 
     //monster attributes
     unsigned char attributes;

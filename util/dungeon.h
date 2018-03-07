@@ -10,7 +10,6 @@
 #define ROOM_WIDTH_I  2
 #define ROOM_HEIGHT_I 3
 
-
 typedef struct Dungeon{
     unsigned * screen;
     unsigned * _distanceMap;

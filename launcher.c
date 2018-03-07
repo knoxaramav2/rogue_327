@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <sys/stat.h>
+#include <ncurses.h>
 
 #include "defs.h"
 #include "dungeon.h"
@@ -91,6 +92,16 @@ void cmd(int argc, char ** argv){
 //UTIL
 int main(int argc, char ** argv){
 
+    #ifdef __CYGWIN
+    printf("CYGWIN DEPENDANT\r\n");
+    fflush(stdout);
+    #endif
+
+    initscr();
+    raw();
+    keypad(stdscr, 1);
+    noecho();
+
     //setup
     cmd(argc, argv);
     srand(time(0));
@@ -129,11 +140,16 @@ int main(int argc, char ** argv){
     while (config._run){
         updateTurn(dungeon);
     }
-    
 
+    renderScreen(dungeon);
+
+    printf("Game over\r\n");
+    
     if (config.save){
         saveGame(dungeon);
     }
+
+    endwin();
 
     return 0;
 }

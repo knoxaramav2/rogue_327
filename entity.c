@@ -12,6 +12,8 @@ Entity * createEntity(char sym, int x, int y, int isMonster){
 
     ret->x = x;
     ret->y = y;
+    ret->lastPcX = -1;
+    ret->lastPcY = -1;
 
     ret->symbol = sym;
     ret->attributes = 0;
