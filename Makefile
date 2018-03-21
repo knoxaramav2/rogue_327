@@ -1,10 +1,11 @@
 #compile nqueens (+ GDB data)
 
-CC = gcc
+CC = g++
 CFLAGS = -std=c11 -g -Iutil
 OUT = dungeon
 CLEANTXT = *.o *.a *.exe
-SRC = launcher.c generators.c dungeon.c console.c algo.c file.c entity.c game.c _win_unix.c
+SRC = launcher.cpp generators.cpp dungeon.cpp console.cpp\
+ algo.cpp file.cpp entity.cpp game.cpp _win_unix.cpp
 
 MACROS = -D=__CYGWIN
 

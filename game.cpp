@@ -291,7 +291,7 @@ void printQueue(){
 }
 
 void queueTurn(Entity * e, int val){
-    TurnItem * ti = malloc(sizeof(TurnItem));
+    TurnItem * ti = (TurnItem*) malloc(sizeof(TurnItem));
     ti->e = e;
     ti->next = 0;
     ti->val = val;

@@ -23,13 +23,13 @@ typedef struct CoordStack{
 } CoordStack;
 
 CoordStack * createCoordStack(){
-    CoordStack * cs = malloc(sizeof(CoordStack));
+    CoordStack * cs = (CoordStack *) malloc(sizeof(CoordStack));
 
     const int defaultSize = 10;
 
     cs->size = defaultSize;
     cs->index = 0;
-    cs->coord = malloc(sizeof(int[2]) * defaultSize);
+    cs->coord = (size_t *[2]) malloc(sizeof(int[2]) * defaultSize);
 
     return cs;
 }
@@ -95,7 +95,7 @@ int checkRoomCollide(int ** rooms, int curr){
 int calculateRooms(Dungeon * dungeon){
 
     int numRooms = randIn(MIN_ROOM, MAX_ROOM);
-    dungeon->roomInfo = malloc(sizeof(int *) * numRooms);
+    dungeon->roomInfo = (void **) malloc(sizeof(int *) * numRooms);
     int i = 0;
     int roomAttempts = 0;
     int shuffleAttempts = 0;
