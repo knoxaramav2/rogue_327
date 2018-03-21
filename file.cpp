@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
 #include <string.h>
 #include <sys/stat.h>
 
 #include "fileIO.h"
 #include "defs.h"
 #include "algo.h"
+
+using namespace std;
 
 unsigned long calculateFileSize(Dungeon * d){
     return 1700 + (4 * d->roomCount);
@@ -21,7 +24,7 @@ char * getGameDir(){
     hLen = strlen(home);
     gLen = strlen(gfolder);
 
-    char * ret = malloc(hLen + gLen + 1);
+    char * ret = (char *) malloc(hLen + gLen + 1);
     strncpy(ret, home, hLen);
     strncpy(ret+hLen, gfolder, gLen + 1);
 
@@ -38,7 +41,7 @@ char * getSaveDir(){
     gLen = strlen(gdir);
     sLen = strlen(sdir);
 
-    char * ret = malloc(gLen + sLen + 1);
+    char * ret = (char *) malloc(gLen + sLen + 1);
     strncpy(ret, gdir, gLen);
     strncpy(ret+gLen, sdir, sLen+1);
 
@@ -70,7 +73,7 @@ unsigned long swapEndian(unsigned long raw){
     return ret;
 }
 
-void writeStream(char * stream, size_t len, FILE * f){
+void writeStream(string stream, size_t len, FILE * f){
     size_t i = 0;
     for (; i < len; ++i){
         fputc(stream[i], f);
@@ -79,7 +82,7 @@ void writeStream(char * stream, size_t len, FILE * f){
 
 //return 32 bit unsigned as big endian representative string
 unsigned char * ui2str(unsigned i){
-    unsigned char * str = malloc(4);
+    unsigned char * str = (unsigned char *) malloc(4);
 
     str[0] = getByte(i, 3);
     str[1] = getByte(i, 2);
@@ -154,11 +157,11 @@ Dungeon * loadGame(){
     fflush(stdout);
 
     //load room data
-    d->roomInfo = malloc(sizeof(int *) * rooms);
+    d->roomInfo = (int **) malloc(sizeof(int *) * rooms);
     d->roomCount = rooms;
 
     for (i=0; i < rooms; ++i){
-        d->roomInfo[i] = malloc(sizeof(int) * 4);
+        d->roomInfo[i] = (int *) malloc(sizeof(int) * 4);
 
         d->roomInfo[i][0] = buf[i][1];
         d->roomInfo[i][1] = buf[i][0];
@@ -207,11 +210,13 @@ void saveGame(Dungeon * d){
     FILE * f = fopen(savePath, "w+");
     
     unsigned fileSize = calculateFileSize(d);
+    string headerTitle = "RLG327-S2018";
+    string empty = "\0\0\0\0";
 
     //write headers
-    writeStream("RLG327-S2018", 12, f);
-    writeStream("\0\0\0\0", 4, f);
-    writeStream(ui2str(fileSize), 4, f);
+    writeStream(headerTitle, 12, f);
+    writeStream(empty, 4, f);
+    writeStream((char *) ui2str(fileSize), 4, f);
 
     printf("Headers saved\r\nWriting hardness\r\n");
 

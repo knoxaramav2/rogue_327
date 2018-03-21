@@ -46,7 +46,7 @@ int getAdjacentIndex(int x, int y, int i){
 
 //QUEUE
 Queue * createQueue(){
-    Queue * ret = malloc(sizeof(Queue));
+    Queue * ret = (Queue *) malloc(sizeof(Queue));
 
     ret->size = 0;
     ret->head = 0;
@@ -84,7 +84,8 @@ void swapLeft(Queue * q, QueueNode * n){
 
 void bubbleNode(Queue * q, QueueNode * n){
 
-    if (n->prev < 5000){
+    unsigned long test = (unsigned long) n->prev;//TODO FIX THIS
+    if (test < 5000){
         return;
     }
 
@@ -104,7 +105,7 @@ void bubbleNode(Queue * q, QueueNode * n){
 
 QueueNode * addToQueue(Queue * q, int id){
 
-    QueueNode * n = malloc(sizeof(QueueNode));
+    QueueNode * n = (QueueNode *) malloc(sizeof(QueueNode));
     n->dist = 255;
     n->id = id;
     n->next = 0;
@@ -177,7 +178,7 @@ void calcDistMap(Dungeon * d, int allowTunnel){
         free(d->_distanceMap);
     }
 
-    d->_distanceMap = malloc(D_SIZE * sizeof(unsigned));
+    d->_distanceMap = (unsigned *) malloc(D_SIZE * sizeof(unsigned));
     memset(d->_distanceMap, 255, D_SIZE);
     d->_distanceMap[CELL(d->player->x, d->player->y)] = 0;
 

@@ -10,7 +10,7 @@
 
 #include "console.h"
 
-Config config;
+//Config config;
 
 typedef struct Coord{
     int x, y;
@@ -29,7 +29,7 @@ CoordStack * createCoordStack(){
 
     cs->size = defaultSize;
     cs->index = 0;
-    cs->coord = (size_t *[2]) malloc(sizeof(int[2]) * defaultSize);
+    cs->coord = (int (*)[2]) malloc(sizeof(int[2]) * defaultSize);
 
     return cs;
 }
@@ -59,7 +59,7 @@ void pushCoordStack(CoordStack * cs, int coord[2]){
     
     if (cs->index == cs->size){
         cs->size *= 2;
-        cs->coord = realloc(cs->coord, sizeof(int[2]) * cs->size);
+        cs->coord = (int (*)[2]) realloc(cs->coord, sizeof(int[2]) * cs->size);
     }
 
     cs->coord[cs->index][0] = coord[0];
@@ -95,13 +95,13 @@ int checkRoomCollide(int ** rooms, int curr){
 int calculateRooms(Dungeon * dungeon){
 
     int numRooms = randIn(MIN_ROOM, MAX_ROOM);
-    dungeon->roomInfo = (void **) malloc(sizeof(int *) * numRooms);
+    dungeon->roomInfo = (int **) malloc(sizeof(int *) * numRooms);
     int i = 0;
     int roomAttempts = 0;
     int shuffleAttempts = 0;
 
     for(; i < numRooms; ++i){
-        dungeon->roomInfo[i] = malloc(sizeof(int) * 4);
+        dungeon->roomInfo[i] = (int *) malloc(sizeof(int) * 4);
         int * t = dungeon->roomInfo[i];
         
         roomAttempts = 0;
@@ -193,7 +193,7 @@ void generateStairs(Dungeon * d){
 */
 int generateCorridors(Dungeon * d){
 
-    char * hasConnection = malloc(d->roomCount);
+    char * hasConnection = (char *) malloc(d->roomCount);
     memset(hasConnection, 0, d->roomCount);
     int doorLoc [2][2] = {{-1,-1}, {-1,-1}};
     int rIdx = 0;

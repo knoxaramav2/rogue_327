@@ -6,7 +6,7 @@
 #include "algo.h"
 #include "defs.h"
 
-Config config;
+//Config config;
 
 int getLastDigit(unsigned v){
     return v%10;

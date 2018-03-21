@@ -12,7 +12,7 @@
 #include "console.h"
 #include "defs.h"
 
-Config config;
+//Config config;
 TurnItem * queue = 0;
 int turn = 0;
 

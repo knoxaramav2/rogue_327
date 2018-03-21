@@ -21,3 +21,4 @@
 3/6/18  Added ncurses, switched unbuffered input to ncurses
 3/6/18  Added windows(cygwin) Unix getch compatibility
 3/7/18  Fixed movement
+3/20/18 Update to C++

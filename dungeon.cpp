@@ -5,18 +5,18 @@
 #include "defs.h"
 #include "config.h"
 
-Config config;
+//Config config;
 
 Dungeon * createDungeon(){
 
-    Dungeon * dungeon  = malloc(sizeof(Dungeon));
-    dungeon->screen = malloc((DUNGEON_WIDTH * DUNGEON_HEIGHT) * sizeof(unsigned));
-    dungeon->_distanceMap = malloc((DUNGEON_WIDTH * DUNGEON_HEIGHT) * sizeof(unsigned));
+    Dungeon * dungeon  = (Dungeon *) malloc(sizeof(Dungeon));
+    dungeon->screen = (unsigned *) malloc((DUNGEON_WIDTH * DUNGEON_HEIGHT) * sizeof(unsigned));
+    dungeon->_distanceMap = (unsigned *) malloc((DUNGEON_WIDTH * DUNGEON_HEIGHT) * sizeof(unsigned));
     memset(dungeon->screen, setHardness(ROCK_SPACE, 50), (DUNGEON_WIDTH * DUNGEON_HEIGHT) * sizeof(unsigned));//generate empty dungeon
     dungeon->roomCount = 0;
     dungeon->roomInfo = 0;
     dungeon->player = 0;
-    dungeon->npcs = malloc(config.numNpc * sizeof(Entity*));
+    dungeon->npcs = (Entity **) malloc(config.numNpc * sizeof(Entity*));
 
     return dungeon;
 }

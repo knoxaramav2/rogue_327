@@ -5,10 +5,10 @@
 #include "entity.h"
 #include "algo.h"
 
-Config config;
+//Config config;
 
 Entity * createEntity(char sym, int x, int y, int isMonster){
-    Entity * ret = malloc(sizeof(Entity));
+    Entity * ret = (Entity *) malloc(sizeof(Entity));
 
     ret->x = x;
     ret->y = y;

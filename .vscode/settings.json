@@ -5,6 +5,7 @@
         "dungeon.h": "c",
         "defs.h": "c",
         "math.h": "c",
-        "algo.h": "c"
+        "algo.h": "c",
+        "xstring": "cpp"
     }
 }
