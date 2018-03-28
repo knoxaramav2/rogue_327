@@ -30,3 +30,5 @@ into the corner or move too quickly towards the player.
 
 Events:
 A priority queue is added too, popped and updated with each action executed. See game.c
+
+Weird string bug while parsing, not sure if its a quirk with visual studio code's intellisence

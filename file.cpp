@@ -273,8 +273,57 @@ vector <string> splitBy(string str, char del){
 //Monsters
 Entity getEntity(vector <string> lines){
 
+    Entity ret = Entity(0,0,0);
+
+    bool hasName = false;
+    bool hasDescription = false;
+    bool hasAttack = false;
+    bool hasHealth = false;
+    bool hasAbility = false;
+    bool hasRarity = false;
+
+    bool description = false;
+
+    
+
     for (string str : lines){
         vector <string> terms = splitBy(str, ' ');
+
+        if (terms.size() == 0)
+            continue;
+
+        string key = terms[0];
+
+        //TODO hash switch instead of this travesty
+        if (key == "NAME"){
+            if (hasName){
+                printf("Duplicate name");
+                return Entity(0,0,0);
+            }
+            hasName = true;
+            printf("Name = %s\r\n", terms[1].c_str());
+        }
+
+        if (key == "DESC"){
+            if (hasDescription){
+                printf("Duplicate description");
+                return Entity(0,0,0);
+            }
+            description = true;
+            hasDescription = true; 
+            continue;
+        }
+
+        if (description){
+            if (key == "."){
+                description = false;
+                printf("Description = %s\r\n", ret.description);
+            }
+            else
+                ret.description += str;
+        }
+        
+
         for (string term : terms){
             printf("[%s] ", term.c_str());
         }
@@ -282,6 +331,7 @@ Entity getEntity(vector <string> lines){
         printf("\r\n");
     }
 
+    return ret;
 }
 
 void loadMonsterDefs(){
@@ -290,6 +340,7 @@ void loadMonsterDefs(){
 
     ifstream i(path);
     if (!i){
+        printf("Monster file not found at %s\r\n", path.c_str());
         return;
     }
 
