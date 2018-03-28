@@ -3,10 +3,15 @@
 #include <string>
 #include <string.h>
 #include <sys/stat.h>
+#include <fstream>
+
+#include <ncurses.h>
 
 #include "fileIO.h"
 #include "defs.h"
 #include "algo.h"
+
+EntityRegistry _monsterReg;
 
 using namespace std;
 
@@ -185,10 +190,11 @@ Dungeon * loadGame(){
 
         //d->screen[i] = setHardness(type, hardness[i]);
 
+        /*
         printf("Load Room %d : (%d, %d) [%d x %d]\r\n", 
             i+1, 
             buf[i][1], buf[i][0],
-            buf[i][3], buf[i][2]);
+            buf[i][3], buf[i][2]);*/
     }
 
     //place player in room
@@ -218,7 +224,7 @@ void saveGame(Dungeon * d){
     writeStream(empty, 4, f);
     writeStream((char *) ui2str(fileSize), 4, f);
 
-    printf("Headers saved\r\nWriting hardness\r\n");
+    //printf("Headers saved\r\nWriting hardness\r\n");
 
     //write map hardness ;)
     {
@@ -233,10 +239,11 @@ void saveGame(Dungeon * d){
             fputc((unsigned char)d->roomInfo[i][3], f);//size y
             fputc((unsigned char)d->roomInfo[i][2], f);//size x
 
+            /*
             printf("Save Room %d : (%d, %d) [%d x %d]\r\n", 
                 i+1, 
                 d->roomInfo[i][1], d->roomInfo[i][0],
-                d->roomInfo[i][3], d->roomInfo[i][2]);
+                d->roomInfo[i][3], d->roomInfo[i][2]);*/
         }
     }
 
@@ -246,3 +253,107 @@ void saveGame(Dungeon * d){
     fflush(f);
     fclose(f);
 }
+
+vector <string> splitBy(string str, char del){
+    vector <string> ret;
+
+    size_t index = 0;
+
+    for (size_t x = 0; x <= str.length(); ++x){
+        if ((str[x] == del || (x+1) == str.length()) && index < x){
+            string cpy = str.substr(index, (x-index) + ((x+1) == str.length()));
+            index = x + 1;
+            ret.push_back(cpy);
+        }
+    }
+
+    return ret;
+}
+
+//Monsters
+Entity getEntity(vector <string> lines){
+
+    for (string str : lines){
+        vector <string> terms = splitBy(str, ' ');
+        for (string term : terms){
+            printf("[%s] ", term.c_str());
+        }
+
+        printf("\r\n");
+    }
+
+}
+
+void loadMonsterDefs(){
+    string path = getGameDir();
+    path += "monster_desc.txt";
+
+    ifstream i(path);
+    if (!i){
+        return;
+    }
+
+    //state checks
+    bool hasMeta = false;
+    bool readMonster = false;
+    bool nextMonster = false;
+
+    vector <string> lines;
+
+    for(string line; getline(i, line);){
+
+        if (line.length() > 0 && line[line.length()-1] == '\r'){
+            line.pop_back();
+        }
+
+        if (hasMeta == false){
+            if (line == "")
+                continue;
+            if (line != "RLG327 MONSTER DESCRIPTION 1"){
+                printf("Missing meta header\r\n");
+                return;
+            }
+
+            hasMeta = true;
+            continue;
+        }
+
+        //skip to next definition
+        if (nextMonster){
+            if (line != "BEGIN MONSTER")
+                continue;
+            else
+                nextMonster = false;
+        }
+
+        if (line == "BEGIN MONSTER"){
+            if (readMonster){
+                lines.clear();
+                nextMonster = true;
+                continue;
+            }
+
+            readMonster = true;
+            continue;
+        }
+
+        if (line == "END"){
+            if (readMonster == false)
+                continue;
+            _monsterReg.registry.push_back(getEntity(lines));
+            lines.clear();
+            readMonster = false;
+            continue;
+        }
+
+        if (readMonster){
+            if (line.length() > 0)
+                lines.push_back(line);
+        }
+
+        printf("%s\r\n", line.c_str());
+
+    }
+
+    i.close();
+} 

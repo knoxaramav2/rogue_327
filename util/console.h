@@ -8,5 +8,6 @@
 //int renderDistance(Dungeon * dungeon, int);
 int getLastDigit(unsigned);
 void updateScreen(Dungeon * d);
+void initColors();
 
 #endif

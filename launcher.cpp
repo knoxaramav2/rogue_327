@@ -97,12 +97,6 @@ int main(int argc, char ** argv){
     //fflush(stdout);
     #endif
 
-    initscr();
-    raw();
-    keypad(stdscr, 1);
-    noecho();
-    curs_set(0);
-
     //setup
     cmd(argc, argv);
     srand(time(0));
@@ -111,8 +105,13 @@ int main(int argc, char ** argv){
         printf("Argument errors found; quitting\r\n");
         return -1;
     }
+
+
     
     Dungeon * dungeon = 0;
+
+    loadMonsterDefs();
+    return 0;
 
     //determine load/save/new=
     if (config.load){
@@ -125,6 +124,13 @@ int main(int argc, char ** argv){
         printf("Unable to get dungeon\r\n");
         return -1;
     }
+
+    initscr();
+    raw();
+    keypad(stdscr, 1);
+    noecho();
+    curs_set(0);
+    start_color();
 
     //play game
     setupGameState(dungeon);

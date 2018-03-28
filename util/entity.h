@@ -6,6 +6,14 @@
 #define TUNNELABLE   4
 #define ERRATIC      8
 
+#include <string>
+#include <vector>
+
+struct Die{
+    int min;
+    int max;
+};
+
 class Entity{
 
     public:
@@ -14,12 +22,21 @@ class Entity{
     //~Entity();
 
     char symbol;
+    int color;
     int x, y;
     int lastPcX, lastPcY;
 
     //monster attributes
     unsigned char attributes;
     char speed;
+    int health;
+    int attack;
+    int rarity;
+    std::string description;
+    std::vector<std::string> colors;
+
+    //For templates
+    Die _speed_;
 };
 
 class Player: public Entity{
@@ -30,6 +47,13 @@ class Player: public Entity{
     ~Player();
 
     unsigned * playerMap;
+};
+
+class EntityRegistry{
+
+    public:
+    std::vector <Entity> registry;
+
 };
 
 //Entity * createEntity(char sym, int x, int y, int isMonster);

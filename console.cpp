@@ -139,3 +139,7 @@ void updateScreen(Dungeon * d){
 
     wrefresh(stdscr);
 }
+
+void initColors(){
+    init_pair(1, COLOR_RED, COLOR_BLACK);
+}
