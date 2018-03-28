@@ -44,6 +44,21 @@ int getAdjacentIndex(int x, int y, int i){
    return CELL(dx, dy);
 }
 
+bool isValidSpace(int x, int y){
+    if (x <= 0 || x >= DUNGEON_WIDTH ||
+        y <= 0 || y >= DUNGEON_HEIGHT)
+    return false;
+    
+    return true;
+}
+
+bool isValidSpace(int pos){
+    int x = getX(pos);
+    int y = getY(pos);
+
+    return isValidSpace(x, y);
+}
+
 //QUEUE
 Queue * createQueue(){
     Queue * ret = (Queue *) malloc(sizeof(Queue));

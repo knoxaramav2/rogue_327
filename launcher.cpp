@@ -1,6 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include <time.h>
 #include <sys/stat.h>
 #include <ncurses.h>
@@ -93,14 +93,15 @@ void cmd(int argc, char ** argv){
 int main(int argc, char ** argv){
 
     #ifdef __CYGWIN
-    printf("CYGWIN DEPENDANT\r\n");
-    fflush(stdout);
+    //printf("CYGWIN DEPENDANT\r\n");
+    //fflush(stdout);
     #endif
 
     initscr();
     raw();
     keypad(stdscr, 1);
     noecho();
+    curs_set(0);
 
     //setup
     cmd(argc, argv);
@@ -117,7 +118,7 @@ int main(int argc, char ** argv){
     if (config.load){
         dungeon = loadGame();
     } else {
-        dungeon = generateDungeon();
+        dungeon = generateDungeon(NULL);
     }
 
     if (dungeon == 0){
@@ -131,17 +132,19 @@ int main(int argc, char ** argv){
 
     calcDistMap(dungeon, 0);
 
-    
-    renderDistance(dungeon, 0);
-    renderDistance(dungeon, 1);
-    
-    renderScreen(dungeon);
+    //renderDistance(dungeon, 0);
+    //renderDistance(dungeon, 1);
+    //renderScreen(dungeon);
+
+    updateScreen(dungeon);
 
     while (config._run){
-        updateTurn(dungeon);
+        updateTurn(&dungeon);
     }
 
-    renderScreen(dungeon);
+    updateScreen(dungeon);
+
+    //renderScreen(dungeon);
 
     printf("Game over\r\n");
     

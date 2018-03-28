@@ -6,6 +6,9 @@
         "defs.h": "c",
         "math.h": "c",
         "algo.h": "c",
-        "xstring": "cpp"
+        "xstring": "cpp",
+        "ios": "cpp",
+        "system_error": "cpp",
+        "xiosbase": "cpp"
     }
 }

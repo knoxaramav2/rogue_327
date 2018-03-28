@@ -1,6 +1,8 @@
 #include <string.h>
 #include <stdio.h>
+#include <ncurses.h>
 
+#include "dungeon.h"
 #include "config.h"
 #include "console.h"
 #include "algo.h"
@@ -35,6 +37,7 @@ int printBoarder(){
 }
 
 //Renderers
+/*
 int clearScreen(){
     //TODO use ascii escape method instead
     int i = 0;
@@ -43,7 +46,7 @@ int clearScreen(){
     }
 
     printf("\r");
-}
+}*/
 
 int renderScreen(Dungeon * dungeon){
 
@@ -55,7 +58,7 @@ int renderScreen(Dungeon * dungeon){
             printf("\r\n");
         }
         unsigned cell = (i%(DUNGEON_WIDTH)) + ((i/DUNGEON_WIDTH) * DUNGEON_WIDTH);
-        Entity * player = dungeon->player;
+        Player * player = dungeon->player;
 
         char monster = hasMonster(dungeon, i);
 
@@ -108,4 +111,31 @@ int renderDistance(Dungeon * dungeon, int allowTunnel){
     //render text below
     printf("\n|\n|\n|\r\n");
     fflush(stdout);
+}
+
+void updateScreen(Dungeon * d){
+
+    Player * p = d->player;
+    unsigned * screen = d->screen;
+    unsigned * pcScreen = p->playerMap;
+
+    int minX = p->x >= 2  ? p->x - 2: 0;
+    int minY = p->y >= 2  ? p->y - 2: 0;
+    int maxX = p->x <= DUNGEON_WIDTH - 2 ? p->x + 2: DUNGEON_WIDTH;
+    int maxY = p->y <= DUNGEON_HEIGHT - 2 ? p->y + 2: DUNGEON_HEIGHT - 1;
+
+    //place surrounding map
+    for (int x = minX; x <= maxX; ++x){
+        for (int y = minY; y <= maxY; ++y){
+            mvprintw(y, x, "%c", getSymbol(screen[(x%DUNGEON_WIDTH) + (y*DUNGEON_WIDTH)]));
+            //int idx = CELL(x, y);
+            //p->playerMap[idx] = screen[idx];
+        }
+    }
+
+
+
+    mvprintw(p->y, p->x, "@");
+
+    wrefresh(stdscr);
 }

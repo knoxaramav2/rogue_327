@@ -7,18 +7,23 @@
 
 //Config config;
 
-Dungeon * createDungeon(){
+Dungeon::Dungeon(){
 
-    Dungeon * dungeon  = (Dungeon *) malloc(sizeof(Dungeon));
-    dungeon->screen = (unsigned *) malloc((DUNGEON_WIDTH * DUNGEON_HEIGHT) * sizeof(unsigned));
-    dungeon->_distanceMap = (unsigned *) malloc((DUNGEON_WIDTH * DUNGEON_HEIGHT) * sizeof(unsigned));
-    memset(dungeon->screen, setHardness(ROCK_SPACE, 50), (DUNGEON_WIDTH * DUNGEON_HEIGHT) * sizeof(unsigned));//generate empty dungeon
-    dungeon->roomCount = 0;
-    dungeon->roomInfo = 0;
-    dungeon->player = 0;
-    dungeon->npcs = (Entity **) malloc(config.numNpc * sizeof(Entity*));
+    screen = (unsigned *) malloc((DUNGEON_WIDTH * DUNGEON_HEIGHT) * sizeof(unsigned));
+    _distanceMap = (unsigned *) malloc((DUNGEON_WIDTH * DUNGEON_HEIGHT) * sizeof(unsigned));
+    memset(screen, setHardness(ROCK_SPACE, 50), (DUNGEON_WIDTH * DUNGEON_HEIGHT) * sizeof(unsigned));//generate empty dungeon
+    roomCount = 0;
+    roomInfo = nullptr;
+    player = nullptr;
+    npcs = new Entity*[config.numNpc];//(Entity **) malloc(config.numNpc * sizeof(Entity*));
+}
 
-    return dungeon;
+Dungeon::~Dungeon(){
+    delete screen;
+    delete _distanceMap;
+    delete roomInfo;
+    delete player;
+    delete npcs;
 }
 
 //Attributes

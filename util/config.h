@@ -1,14 +1,16 @@
 #ifndef CONFIG
 #define CONFIG
 
-typedef struct Config {
+class Config {
+
+    public:
     int load;
     int save;
 
     int _run;
 
     int numNpc;
-} Config;
+};
 
 extern Config config;
 

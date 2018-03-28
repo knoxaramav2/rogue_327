@@ -128,7 +128,7 @@ Dungeon * loadGame(){
     fread(cversion, 1, 4, f);
     fread(cfileSize, 1, 4, f);
 
-    Dungeon * d = createDungeon();
+    Dungeon * d = new Dungeon();//createDungeon();
 
     //load dungeon
     char hardness [DUNGEON_HEIGHT * DUNGEON_WIDTH];
@@ -197,7 +197,7 @@ Dungeon * loadGame(){
     int xLoc = roomSet[0] + (roomSet[2] / 2 );
     int yLoc = roomSet[1] + (roomSet[3] / 2);
 
-    d->player = createEntity('@', xLoc, yLoc, 0);
+    d->player = new Player(xLoc, yLoc);//createEntity('@', xLoc, yLoc, 0);
 
     return d;
 }

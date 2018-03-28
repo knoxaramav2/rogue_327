@@ -6,7 +6,12 @@
 #define TUNNELABLE   4
 #define ERRATIC      8
 
-typedef struct Entity{
+class Entity{
+
+    public:
+
+    Entity(char sym, int x, int y);
+    //~Entity();
 
     char symbol;
     int x, y;
@@ -15,9 +20,19 @@ typedef struct Entity{
     //monster attributes
     unsigned char attributes;
     char speed;
-} Entity;
+};
 
-Entity * createEntity(char sym, int x, int y, int isMonster);
+class Player: public Entity{
+
+    public:
+
+    Player(int x, int y);
+    ~Player();
+
+    unsigned * playerMap;
+};
+
+//Entity * createEntity(char sym, int x, int y, int isMonster);
 void destroyEntity(Entity * e);
 int hasAttribute(Entity * e, unsigned char);
 

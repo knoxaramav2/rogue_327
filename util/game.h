@@ -3,15 +3,18 @@
 
 #include "dungeon.h"
 
-typedef struct TurnItem{
+class TurnItem{
+
+    public:
+
     Entity * e;
     int val;
-    struct TurnItem * next;
-}TurnItem;
+    TurnItem * next;
+};
 
 void setupGameState(Dungeon * d);
 void spawnPlayers(Dungeon * d);
-void updateTurn(Dungeon * d);
+void updateTurn(Dungeon ** d);
 Entity * attack(Entity * attacker, Dungeon *d);
 void moveByStrategy(Entity * e, Dungeon * d, int *toX, int *toY);
 

@@ -22,3 +22,5 @@
 3/6/18  Added windows(cygwin) Unix getch compatibility
 3/7/18  Fixed movement
 3/20/18 Update to C++
+3/24/18 Fixed stairs, classes, inheritence
+3/25/18 Fixed edge blocking, removed unecessary printfs

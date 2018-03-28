@@ -3,9 +3,10 @@
 
 #include "dungeon.h"
 
-int clearScreen();
-int renderScreen(Dungeon * dungeon);
-int renderDistance(Dungeon * dungeon, int);
+//int clearScreen();
+//int renderScreen(Dungeon * dungeon);
+//int renderDistance(Dungeon * dungeon, int);
 int getLastDigit(unsigned);
+void updateScreen(Dungeon * d);
 
 #endif

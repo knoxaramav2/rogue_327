@@ -10,19 +10,25 @@
 #define ROOM_WIDTH_I  2
 #define ROOM_HEIGHT_I 3
 
-typedef struct Dungeon{
+class Dungeon{
+
+    public:
+
+    Dungeon();
+    ~Dungeon();
+
     unsigned * screen;
     unsigned * _distanceMap;
 
     int ** roomInfo;
     int roomCount;
 
-    Entity * player;
+    Player * player;
     Entity ** npcs;
-} Dungeon;
+};
 
-Dungeon * createDungeon();
-Dungeon * generateDungeon();
+//Dungeon * createDungeon();
+Dungeon * generateDungeon(Dungeon * d);
 
 //Attributes
 unsigned getHardness(unsigned cell);

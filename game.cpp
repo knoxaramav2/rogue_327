@@ -13,8 +13,13 @@
 #include "defs.h"
 
 //Config config;
-TurnItem * queue = 0;
+TurnItem * queue = nullptr;
 int turn = 0;
+
+#define STATE_NORMAL 0
+#define STATE_REGEN  1
+
+int STATE_FLAG = STATE_NORMAL;
 
 int getInput(){
 
@@ -23,8 +28,8 @@ int getInput(){
         char c2 = 0;
         char c3 = 0;
 
-        printf("<<%d %d %d>>\r\n", c, c2, c3);
-        fflush(stdout);
+        //printf("<<%d %d %d>>\r\n", c, c2, c3);
+        //fflush(stdout);
 
         switch(c){
             case '7':
@@ -53,7 +58,9 @@ int getInput(){
                 return MIDDLE_LEFT;
 
             case '>':
+            case '.':
                 return MOVE_LOWER;
+            case ',':
             case '<':
                 return MOVE_UPPER;
             case '5':
@@ -90,7 +97,7 @@ void tunnelAt(Dungeon * d, int coord){
     //d->screen[coord]=setSymbol(d->screen[coord], HALL_SPACE);
     d->screen[coord]=setHardness(d->screen[coord], (unsigned) hardness);
 
-    printf("Tunnel: %u => %u\r\n", dbHardness, getHardness(d->screen[coord]));
+    //printf("Tunnel: %u => %u\r\n", dbHardness, getHardness(d->screen[coord]));
 }
 
 Entity * attack(Entity * attacker, Dungeon *d){
@@ -118,7 +125,27 @@ void moveByStrategy(Entity * e, Dungeon * d, int * toX, int * toY){
 
 }
 
-void allowMove(Entity * e, Dungeon * d){
+void updatePcMap(Dungeon * d){
+
+    Player * p = d->player;
+    unsigned * screen = d->screen;
+    unsigned * pcScreen = p->playerMap;
+
+    int minX = p->x >= 2  ? p->x - 2: 0;
+    int minY = p->y >= 2  ? p->y - 2: 0;
+    int maxX = p->x <= DUNGEON_WIDTH - 2 ? p->x + 2: DUNGEON_WIDTH;
+    int maxY = p->y <= DUNGEON_HEIGHT - 2 ? p->y + 2: DUNGEON_HEIGHT;
+
+    for (int x = minX; x < maxX; ++x){
+        for (int y = minY; y < maxY; ++y){
+            int idx = CELL(x, y);
+            p->playerMap[idx] = screen[idx];
+        }
+    }
+
+}
+
+void allowMove(Entity * e, Dungeon ** d){
 
     int fromX, fromY;
     int toX, toY;
@@ -128,7 +155,7 @@ void allowMove(Entity * e, Dungeon * d){
     toX = fromX;
     toY = fromY;
 
-    if (e == d->player){
+    if (e == (*d)->player){
 
         int acceptKey;
         int _x = e->x, _y = e->y;
@@ -141,19 +168,19 @@ void allowMove(Entity * e, Dungeon * d){
 
             int kc = getInput();
 
-            printf("<%d>\r\n", kc);
+            //printf("<%d>\r\n", kc);
 
             switch(kc){
                 case BOTTOM_LEFT: 
                     --_x;
-                    --_y;
+                    ++_y;
                 break;
                 case BOTTOM_MIDDLE: 
                     ++_y;
                 break;
                 case BOTTOM_RIGHT: 
                     ++_x;
-                    --_y;
+                    ++_y;
                 break;
                 case MIDDLE_LEFT: 
                     --_x;
@@ -163,14 +190,14 @@ void allowMove(Entity * e, Dungeon * d){
                 break;
                 case TOP_LEFT: 
                     --_x;
-                    ++_y;
+                    --_y;
                 break;
                 case TOP_MIDDLE: 
                     --_y;
                 break;
                 case TOP_RIGHT: 
                     ++_x;
-                    ++_y;
+                    --_y;
                 break;
 
                 case REST_TURN: break;
@@ -178,116 +205,70 @@ void allowMove(Entity * e, Dungeon * d){
                 case MOVE_UPPER:
                 case MOVE_LOWER:
 
+                {
+                char stairSym = MOVE_UPPER ? '<' : '>';
+
+                queue = nullptr;
+
+                *d = generateDungeon(*d);
+                setupGameState(*d);
+                spawnPlayers(*d);
+                calcDistMap(*d, 0);
+
+                STATE_FLAG = STATE_REGEN;
+
+                return;
+
                 //regenerate level
                 //place player on staircase
 
+                }
+
                 break;
 
-                case QUIT_GAME: config._run = 0; break;
+                case QUIT_GAME: config._run = 0; return;
                 default: acceptKey = 0;
             }
+
+            if (!isValidSpace(_x, _y)){
+                _x = e->x;
+                _y = e->y;
+                acceptKey = 0;
+            }
+
         } while(!acceptKey);
 
         //check for obstruction
-        if (getSymbol(d->screen[CELL(_x, _y)]) == ROCK_SPACE){
-            tunnelAt(d, CELL(_x, _y));
+        if (getSymbol((*d)->screen[CELL(_x, _y)]) == ROCK_SPACE){
+            tunnelAt(*d, CELL(_x, _y));
         } else {
+
             toX = _x;
             toY = _y;
         }
 
     } else {
-        moveByStrategy(e, d, &toX, &toY);   
+        moveByStrategy(e, *d, &toX, &toY);   
     }
 
-    Entity * victim = attack(e, d);
+    Entity * victim = attack(e, *d);
 
-    printf("%c [%d,%d] => [%d,%d]\r\n", e->symbol, fromX, fromY, toX, toY);
-
-
+    //printf("%c [%d,%d] => [%d,%d]\r\n", e->symbol, fromX, fromY, toX, toY);
     e->x = toX;
     e->y = toY;
 
-    /*
-
-    if (e == d->player){
-
-        printf(">> ");
-
-        fromX = e->x;
-        fromY = e->y;
-        
-        int acceptKey;
-
-        do{
-            fflush(stdin);
-            char c = getchar();
-
-            printf("\n\r<<<%c>>>\r\n", c);
-
-            
-            acceptKey = 1;
-            switch(c){
-                case 'w': --e->y; break;
-                case 'a': --e->x; break;
-                case 's': ++e->y; break;
-                case 'd': ++e->x; break;
-                case 'q': config._run = 0; break;
-                default: acceptKey = 0;
-            }
-        } while(!acceptKey);
-
-        printf("%c [%d,%d] => [%d,%d]\r\n", e->symbol, lastX, lastY, e->x, e->y);
-
-        calcDistMap(d, 1);
-
-    } else {
-        
-        int i = 0;
-        int smallIdx = 0;
-        unsigned smallVal = 999;
-        for (;i < 8; ++i){
-            int adjIdx = getAdjacentIndex(e->x, e->y, i);
-
-            if (adjIdx < 1 || adjIdx > (DUNGEON_HEIGHT * DUNGEON_WIDTH)){
-                continue;
-            }
-
-            unsigned w = d->_distanceMap[adjIdx];
-
-            if (w < smallVal && w >= 0){
-                smallVal = w;
-                smallIdx = adjIdx;
-            }
-        }
-
-        int lastX = e->x;
-        int lastY = e->y;
-
-        e->x = getX(smallIdx);
-        e->y = getY(smallIdx);
-
-        printf("%c [%d,%d] => [%d,%d]\r\n", e->symbol, lastX, lastY, e->x, e->y);
-
-        //lose game
-        if (smallVal == 0){
-            config._run = 0;
-            return;
-        }
-
-    }
-    */
+    return;
 }
 
 void printQueue(){
     TurnItem * ti = queue;
     while(ti){
-        printf("[%c %d] ", ti->e->symbol, ti->val);
+        //printf("[%c %d] ", ti->e->symbol, ti->val);
         ti = ti->next;
     }
 
-    printf("\r\n");
-    fflush(stdout);
+    //printf("\r\n");
+    //fflush(stdout);
 }
 
 void queueTurn(Entity * e, int val){
@@ -364,7 +345,7 @@ void spawnPlayers(Dungeon * d){
 
         printf("%c at %d %d\r\n", sym, mx, my);
 
-        d->npcs[i] = createEntity(sym, mx, my, 1);
+        d->npcs[i] = new Entity(sym, mx, my);//createEntity(sym, mx, my, 1);
         queueTurn(d->npcs[i], 1000/d->npcs[i]->speed);
     }
 
@@ -374,20 +355,31 @@ void spawnPlayers(Dungeon * d){
     int xLoc = roomSet[0] + (roomSet[2] / 2 );
     int yLoc = roomSet[1] + (roomSet[3] / 2);
 
-    d->player = createEntity('@', xLoc, yLoc, 0);
+    d->player = new Player(xLoc, yLoc);//createEntity('@', xLoc, yLoc, 0);
     queueTurn(d->player, 100);
 }
 
-void updateTurn(Dungeon * d){
+void updateTurn(Dungeon ** d){
     ++turn;
 
     if (turn >= queue->val){
         Entity * e = queue->e;
         int val = queue->val;
 
-        printf("Turn %d\r\n", turn);
+        //printf("Turn %d\r\n", turn);
+        updateScreen(*d);
         allowMove(e, d);
-        renderScreen(d);
+        updateScreen(*d);
+        //renderScreen(*d);
+        updatePcMap(*d);
+
+        if (STATE_FLAG == STATE_REGEN){
+            STATE_FLAG = STATE_NORMAL;
+            turn = 0;
+            return;
+        }
+
+        
         pop();
         queueTurn(e, val + (1000/e->speed));
 

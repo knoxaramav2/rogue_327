@@ -95,13 +95,13 @@ int checkRoomCollide(int ** rooms, int curr){
 int calculateRooms(Dungeon * dungeon){
 
     int numRooms = randIn(MIN_ROOM, MAX_ROOM);
-    dungeon->roomInfo = (int **) malloc(sizeof(int *) * numRooms);
+    dungeon->roomInfo = new int*[numRooms];
     int i = 0;
     int roomAttempts = 0;
     int shuffleAttempts = 0;
 
     for(; i < numRooms; ++i){
-        dungeon->roomInfo[i] = (int *) malloc(sizeof(int) * 4);
+        dungeon->roomInfo[i] = new int[4];;
         int * t = dungeon->roomInfo[i];
         
         roomAttempts = 0;
@@ -128,8 +128,8 @@ int calculateRooms(Dungeon * dungeon){
             //Free memory, give up
             if (shuffleAttempts == 5){
                 int j = 0;
-                for (; j < i; ++ j) {free (dungeon->roomInfo[i]);}
-                free(dungeon->roomInfo);
+                for (; j < i; ++ j) {delete dungeon->roomInfo[i];}
+                delete dungeon->roomInfo;
                 return 0;
             }
         }
@@ -338,9 +338,14 @@ int generateCorridors(Dungeon * d){
     return 0;
 }
 
-Dungeon * generateDungeon(){
+Dungeon * generateDungeon(Dungeon * dungeon){
     //Generate rock map
-    Dungeon * dungeon = createDungeon();
+
+    if (dungeon){
+        delete dungeon;
+    }
+
+    dungeon = new Dungeon();
 
     //randomize rock hardness
     {
@@ -365,7 +370,7 @@ Dungeon * generateDungeon(){
     //Attempt to generate rooms
     dungeon->roomCount = calculateRooms(dungeon);
     if (dungeon->roomCount == 0){
-        free(dungeon);
+        delete dungeon;
         return 0;
     }
 
@@ -378,8 +383,6 @@ Dungeon * generateDungeon(){
         int xx = x + cr[2];
         int yy = y + cr[3];
 
-        printf("%d x %d\r\n", cr[2], cr[3]);
-
         for (; x < xx; ++x){
             for (y = cr[1]; y < yy; ++y){
                 dungeon->screen[CELL(x, y)] = setHardness(OPEN_SPACE, 0);
@@ -389,44 +392,6 @@ Dungeon * generateDungeon(){
 
     generateCorridors(dungeon);
     generateStairs(dungeon);
-
-    /*
-    //place player in room
-    int rId = randIn(0, dungeon->roomCount);
-    int * roomSet = dungeon->roomInfo[rId];
-    int xLoc = roomSet[0] + (roomSet[2] / 2 );
-    int yLoc = roomSet[1] + (roomSet[3] / 2);
-
-    dungeon->player = createEntity('@', xLoc, yLoc, 0);
-
-    //randomly place monster
-    for (i=0; i<config.numNpc; ++i){
-        int mx=-1, my;
-        do{
-            mx = randIn(0, DUNGEON_WIDTH);
-            my = randIn(0, DUNGEON_HEIGHT);
-
-            unsigned open = getSymbol(dungeon->screen[CELL(mx, my)]);
-            if (open == ROCK_SPACE)
-                mx = -1;
-        } while (mx < 0);
-
-        //determine npcs type
-        char sym = randIn(0, 4);
-        switch(sym){
-            case 0: sym='p'; break;
-            case 1: sym='P'; break;
-            case 2: sym='d'; break;
-            case 3: sym='s'; break;
-        }
-
-        printf("%c at %d %d\r\n", sym, mx, my);
-
-        dungeon->npcs[i] = createEntity(sym, mx, my, 1);
-    }*/
-
-    //renderScreen(dungeon);
-    //fflush(stdout);
 
     return dungeon;
 }

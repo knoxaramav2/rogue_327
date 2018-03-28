@@ -21,7 +21,7 @@ an associated array that describes if a cell has been visited, as well as making
 to check neighboring nodes. See dungeon.c
 
 Player movement:
-WASD keys
+Number Keys
 'q' quits game
 
 Monster movement:
