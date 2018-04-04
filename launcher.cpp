@@ -111,7 +111,7 @@ int main(int argc, char ** argv){
     Dungeon * dungeon = 0;
 
     loadMonsterDefs();
-    return 0;
+    //return 0;
 
     //determine load/save/new=
     if (config.load){

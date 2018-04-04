@@ -64,7 +64,7 @@ class MonsterDefinition{
 class MonsterRegistry{
 
     public:
-    std::vector <Entity> registry;
+    std::vector <MonsterDefinition> registry;
 
 };
 

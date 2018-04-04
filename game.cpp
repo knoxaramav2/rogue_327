@@ -11,6 +11,9 @@
 #include "config.h"
 #include "console.h"
 #include "defs.h"
+#include "entity.h"
+
+//MonsterRegistry _monsterReg;
 
 //Config config;
 TurnItem * queue = nullptr;
@@ -20,6 +23,16 @@ int turn = 0;
 #define STATE_REGEN  1
 
 int STATE_FLAG = STATE_NORMAL;
+
+int rollDice(Die d){
+    int sum = d.offset;
+
+    for (int i = 0; i < d.rolls; ++i){
+        sum += randIn(1, d.range);
+    }
+
+    return sum;
+}
 
 int getInput(){
 
@@ -334,18 +347,22 @@ void spawnPlayers(Dungeon * d){
                 mx = -1;
         } while (mx < 0);
 
+        MonsterDefinition def = 
+            _monsterReg.registry[randIn(0, _monsterReg.registry.size())];
+        
         //determine npcs type
-        char sym = randIn(0, 4);
-        switch(sym){
-            case 0: sym='p'; break;
-            case 1: sym='P'; break;
-            case 2: sym='d'; break;
-            case 3: sym='s'; break;
-        }
-
-        printf("%c at %d %d\r\n", sym, mx, my);
-
+        char sym = def.name[0];
+        //printf("%c at %d %d\r\n", sym, mx, my);
         d->npcs[i] = new Entity(sym, mx, my);//createEntity(sym, mx, my, 1);
+        
+        d->npcs[i]->colors = def.colors;
+        d->npcs[i]->attributes = def.attributes;
+        d->npcs[i]->speed = rollDice(def.speed);
+        d->npcs[i]->health = rollDice(def.speed);
+        d->npcs[i]->attack = def.attack;
+        d->npcs[i]->rarity = def.rarity;
+
+        
         queueTurn(d->npcs[i], 1000/d->npcs[i]->speed);
     }
 

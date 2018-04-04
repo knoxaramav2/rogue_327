@@ -133,9 +133,21 @@ void updateScreen(Dungeon * d){
         }
     }
 
+    //draw monsters
+    for(int i = 0; i < config.numNpc; ++i){
+        Entity * e = d->npcs[i];
+        int c = randIn(0, e->colors.size());
+        std::string s;
+        s += e->symbol;
+        attron(COLOR_PAIR(e->colors[c]));
+        mvprintw(e->y, e->x, s.c_str());
+        attroff(COLOR_PAIR(e->colors[c]));
+    }
 
-
+    //draw player
+    attron(COLOR_PAIR(COLOR_GREEN));
     mvprintw(p->y, p->x, "@");
+    attroff(COLOR_PAIR(COLOR_GREEN));
 
     wrefresh(stdscr);
 }

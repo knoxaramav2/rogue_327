@@ -273,6 +273,7 @@ Die getDie(string raw){
 
     d.range = atoi(tmp.c_str());
 
+    return d;
 }
 
 vector <string> splitBy(string str, char del){
@@ -291,12 +292,17 @@ vector <string> splitBy(string str, char del){
     return ret;
 }
 
+string getDatString(string fterm, string raw){
+    raw.erase(raw.begin(), raw.begin()+fterm.size());
+    return raw;
+}
+
 //Monsters
 void loadProfiles(vector <string> lines){
 
     Entity ret = Entity(0,0,0);
 
-    enum offset {_name, _desc, _clr, _speed, _abil, _hp, _dmg, _rare};
+    enum offset {_name, _desc, _color, _speed, _abil, _hp, _dmg, _rare};
     int inst [8] = {0};
     
     bool begin = false;
@@ -305,6 +311,8 @@ void loadProfiles(vector <string> lines){
 
     for (int i = 0; i < lines.size(); ++i){
         string str = lines[i];
+        if (str[str.size()-1] == '\r')
+            str.pop_back();
         vector <string> terms = splitBy(str, ' ');
 
         if (terms.size() == 0)
@@ -314,35 +322,86 @@ void loadProfiles(vector <string> lines){
             if (terms.size() != 2)
                 continue;
             
-            begin == (terms[0] == "BEGIN" && terms[1] == "MONSTER");
+            begin = (terms[0] == "BEGIN" && terms[1] == "MONSTER");
             if (begin)
                 def = MonsterDefinition();
 
             continue;
+        } else {
+            if (terms[0] == "END"){
+                begin = false;
+                _monsterReg.registry.push_back(def);
+                continue;
+            }
         }
 
         if (terms[0] == "NAME"){
-            def.name = terms[1];
+            def.name = getDatString(terms[0], str);
+            inst[_name]++;
+
+            printf("NAME = %s\n", def.name.c_str());
         } else if (terms[0] == "DESC"){
-            
+            inst[_desc]++;
+            for (++i;i < lines.size() ;++i){
+                if (lines[i][0] == '.')
+                    break;
+                def.description += lines[i] + "\n";
+            }
+
+            printf("DESC = %s\n", def.description.c_str());
         } else if (terms[0] == "COLOR"){
 
+            inst[_color]++;
+
+            for (int j = 1; j < terms.size(); ++j){
+                string clr = terms[j];
+
+                if (clr == "BLACK") def.colors.push_back(COLOR_WHITE);
+                else if (clr == "RED") def.colors.push_back(COLOR_RED);
+                else if (clr == "GREEN") def.colors.push_back(COLOR_GREEN);
+                else if (clr == "YELLOW") def.colors.push_back(COLOR_YELLOW);
+                else if (clr == "BLUE") def.colors.push_back(COLOR_BLUE);
+                else if (clr == "MAGENTA") def.colors.push_back(COLOR_MAGENTA);
+                else if (clr == "CYAN") def.colors.push_back(COLOR_CYAN);
+                else if (clr == "WHITE") def.colors.push_back(COLOR_WHITE);
+
+            }
         } else if (terms[0] == "SPEED"){
-
+            inst[_speed]++;
+            Die d = getDie(terms[1]);
+            def.speed = d;
+            printf("SPEED = %d + %dd%d\n", 
+                def.speed.offset,
+                def.speed.rolls,
+                def.speed.range);
         } else if (terms[0] == "ABIL"){
-
+            inst[_abil]++;
+            //def._abil = getDie(terms[1]);
+            /*printf("ABIL = %d + %dd%d\n", 
+                def.speed.offset,
+                def.speed.rolls,
+                def.speed.range);*/
         } else if (terms[0] == "HP"){
-
+            inst[_hp]++;
+            def.health = getDie(terms[1]);
+            printf("HP = %d + %dd%d\n", 
+                def.health.offset,
+                def.health.rolls,
+                def.health.range);
         } else if (terms[0] == "DAM"){
-
+            inst[_dmg]++;
+            def.attack = getDie(terms[1]);
+            printf("DAM = %d + %dd%d\n", 
+                def.attack.offset,
+                def.attack.rolls,
+                def.attack.range);
         } else if (terms[0] == "RRTY"){
-
+            inst[_rare]++;
+            def.rarity = atoi(terms[1].c_str());
+            printf("RRTY = %d\n", def.rarity);
         } else {
 
         }
-
-
-
     }
 }
 

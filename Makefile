@@ -27,6 +27,6 @@ clean:
 
 .PHONY: run
 run:
-	./$(RUNPATH) --nummon 0
+	./$(RUNPATH) --nummon 10
 		
 

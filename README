@@ -35,3 +35,4 @@ Weird string bug while parsing, not sure if its a quirk with visual studio code'
 
 
 Backlogged a bit, monsters may not generate correctly
+Monster movement broken while I refactor some classes.

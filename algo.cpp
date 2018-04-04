@@ -268,5 +268,8 @@ void calcDistMap(Dungeon * d, int allowTunnel){
 }
 
 int randIn(int min, int max){
+    if (min == max)
+        return max;
+
     return (rand()%(max-min)) + min;
 }
