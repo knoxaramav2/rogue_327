@@ -8,7 +8,4 @@
     void saveGame(Dungeon *);
     void loadMonsterDefs();
 
-    extern EntityRegistry _monsterReg;
-
-
 #endif

@@ -11,7 +11,7 @@
 #include "defs.h"
 #include "algo.h"
 
-EntityRegistry _monsterReg;
+MonsterRegistry _monsterReg;
 
 using namespace std;
 
@@ -254,6 +254,27 @@ void saveGame(Dungeon * d){
     fclose(f);
 }
 
+Die getDie(string raw){
+    Die d;
+
+    string tmp;
+
+    for (char c : raw){
+        if (c == '+'){
+            d.offset = atoi(tmp.c_str());
+            tmp = "";
+        } else if (c == 'd'){
+            d.rolls = atoi(tmp.c_str());
+            tmp = "";
+        } else {
+            tmp += c;
+        }
+    }
+
+    d.range = atoi(tmp.c_str());
+
+}
+
 vector <string> splitBy(string str, char del){
     vector <string> ret;
 
@@ -271,67 +292,58 @@ vector <string> splitBy(string str, char del){
 }
 
 //Monsters
-Entity getEntity(vector <string> lines){
+void loadProfiles(vector <string> lines){
 
     Entity ret = Entity(0,0,0);
 
-    bool hasName = false;
-    bool hasDescription = false;
-    bool hasAttack = false;
-    bool hasHealth = false;
-    bool hasAbility = false;
-    bool hasRarity = false;
-
-    bool description = false;
-
+    enum offset {_name, _desc, _clr, _speed, _abil, _hp, _dmg, _rare};
+    int inst [8] = {0};
     
+    bool begin = false;
 
-    for (string str : lines){
+    MonsterDefinition def;
+
+    for (int i = 0; i < lines.size(); ++i){
+        string str = lines[i];
         vector <string> terms = splitBy(str, ' ');
 
         if (terms.size() == 0)
             continue;
 
-        string key = terms[0];
+        if (begin == false){
+            if (terms.size() != 2)
+                continue;
+            
+            begin == (terms[0] == "BEGIN" && terms[1] == "MONSTER");
+            if (begin)
+                def = MonsterDefinition();
 
-        //TODO hash switch instead of this travesty
-        if (key == "NAME"){
-            if (hasName){
-                printf("Duplicate name");
-                return Entity(0,0,0);
-            }
-            hasName = true;
-            printf("Name = %s\r\n", terms[1].c_str());
-        }
-
-        if (key == "DESC"){
-            if (hasDescription){
-                printf("Duplicate description");
-                return Entity(0,0,0);
-            }
-            description = true;
-            hasDescription = true; 
             continue;
         }
 
-        if (description){
-            if (key == "."){
-                description = false;
-                printf("Description = %s\r\n", ret.description);
-            }
-            else
-                ret.description += str;
-        }
-        
+        if (terms[0] == "NAME"){
+            def.name = terms[1];
+        } else if (terms[0] == "DESC"){
+            
+        } else if (terms[0] == "COLOR"){
 
-        for (string term : terms){
-            printf("[%s] ", term.c_str());
+        } else if (terms[0] == "SPEED"){
+
+        } else if (terms[0] == "ABIL"){
+
+        } else if (terms[0] == "HP"){
+
+        } else if (terms[0] == "DAM"){
+
+        } else if (terms[0] == "RRTY"){
+
+        } else {
+
         }
 
-        printf("\r\n");
+
+
     }
-
-    return ret;
 }
 
 void loadMonsterDefs(){
@@ -352,59 +364,10 @@ void loadMonsterDefs(){
     vector <string> lines;
 
     for(string line; getline(i, line);){
-
-        if (line.length() > 0 && line[line.length()-1] == '\r'){
-            line.pop_back();
-        }
-
-        if (hasMeta == false){
-            if (line == "")
-                continue;
-            if (line != "RLG327 MONSTER DESCRIPTION 1"){
-                printf("Missing meta header\r\n");
-                return;
-            }
-
-            hasMeta = true;
-            continue;
-        }
-
-        //skip to next definition
-        if (nextMonster){
-            if (line != "BEGIN MONSTER")
-                continue;
-            else
-                nextMonster = false;
-        }
-
-        if (line == "BEGIN MONSTER"){
-            if (readMonster){
-                lines.clear();
-                nextMonster = true;
-                continue;
-            }
-
-            readMonster = true;
-            continue;
-        }
-
-        if (line == "END"){
-            if (readMonster == false)
-                continue;
-            _monsterReg.registry.push_back(getEntity(lines));
-            lines.clear();
-            readMonster = false;
-            continue;
-        }
-
-        if (readMonster){
-            if (line.length() > 0)
-                lines.push_back(line);
-        }
-
-        printf("%s\r\n", line.c_str());
-
+        lines.push_back(line);
     }
+
+    loadProfiles(lines);
 
     i.close();
 } 

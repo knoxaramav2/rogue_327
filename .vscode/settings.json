@@ -9,6 +9,12 @@
         "xstring": "cpp",
         "ios": "cpp",
         "system_error": "cpp",
-        "xiosbase": "cpp"
+        "xiosbase": "cpp",
+        "initializer_list": "cpp",
+        "type_traits": "cpp",
+        "vector": "cpp",
+        "xutility": "cpp",
+        "iosfwd": "cpp",
+        "xlocale": "cpp"
     }
 }

@@ -1,0 +1,16 @@
+RLG327 MONSTER DESCRIPTION 1
+
+BEGIN MONSTER
+NAME TEST_MON
+DESC
+A description of test_mon
+Something something batman
+.
+COLOR red blue
+SPEED 10+2d2
+ABIL smart
+HP 50
+DAM 10
+RRTY 20
+
+END

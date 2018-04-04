@@ -10,8 +10,9 @@
 #include <vector>
 
 struct Die{
-    int min;
-    int max;
+    int rolls;
+    int offset;
+    int range;
 };
 
 class Entity{
@@ -30,13 +31,9 @@ class Entity{
     unsigned char attributes;
     char speed;
     int health;
-    int attack;
+    Die attack;
     int rarity;
-    std::string description;
-    std::vector<std::string> colors;
-
-    //For templates
-    Die _speed_;
+    std::vector<int> colors;
 };
 
 class Player: public Entity{
@@ -49,12 +46,29 @@ class Player: public Entity{
     unsigned * playerMap;
 };
 
-class EntityRegistry{
+class MonsterDefinition{
+
+    public:
+    //monster attributes
+    std::string name;
+    unsigned char attributes;
+    Die speed;
+    Die health;
+    Die attack;
+    int rarity;
+    std::string description;
+    std::vector<int> colors;
+};
+
+
+class MonsterRegistry{
 
     public:
     std::vector <Entity> registry;
 
 };
+
+extern MonsterRegistry _monsterReg;
 
 //Entity * createEntity(char sym, int x, int y, int isMonster);
 void destroyEntity(Entity * e);

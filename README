@@ -32,3 +32,6 @@ Events:
 A priority queue is added too, popped and updated with each action executed. See game.c
 
 Weird string bug while parsing, not sure if its a quirk with visual studio code's intellisence
+
+
+Backlogged a bit, monsters may not generate correctly
