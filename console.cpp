@@ -129,7 +129,7 @@ void updateScreen(Dungeon * d){
         for (int y = minY; y <= maxY; ++y){
             mvprintw(y, x, "%c", getSymbol(screen[(x%DUNGEON_WIDTH) + (y*DUNGEON_WIDTH)]));
             //int idx = CELL(x, y);
-            //p->playerMap[idx] = screen[idx];
+            //p->playerMap[qidx] = screen[idx];
         }
     }
 
@@ -137,10 +137,8 @@ void updateScreen(Dungeon * d){
     for(int i = 0; i < config.numNpc; ++i){
         Entity * e = d->npcs[i];
         int c = randIn(0, e->colors.size());
-        std::string s;
-        s += e->symbol;
         attron(COLOR_PAIR(e->colors[c]));
-        mvprintw(e->y, e->x, s.c_str());
+        mvprintw(e->y, e->x, "%c", e->symbol);
         attroff(COLOR_PAIR(e->colors[c]));
     }
 

@@ -25,6 +25,9 @@ class Dungeon{
 
     Player * player;
     Entity ** npcs;
+
+    //debug states
+    bool fogOfWar;
 };
 
 //Dungeon * createDungeon();

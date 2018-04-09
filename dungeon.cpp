@@ -16,6 +16,8 @@ Dungeon::Dungeon(){
     roomInfo = nullptr;
     player = nullptr;
     npcs = new Entity*[config.numNpc];//(Entity **) malloc(config.numNpc * sizeof(Entity*));
+
+    fogOfWar = true;
 }
 
 Dungeon::~Dungeon(){

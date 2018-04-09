@@ -7,12 +7,22 @@
 
 #include "defs.h"
 
+bool isMonsterVisible(Dungeon * d, Entity * m){
+
+
+    return true;
+}
+
 int getY(int i){
     return i / DUNGEON_WIDTH;
 }
 
 int getX(int i){
     return i - ((i/DUNGEON_WIDTH) * DUNGEON_WIDTH);
+}
+
+int getIndex(int x, int y){
+    return CELL(x, y);
 }
 
 /*

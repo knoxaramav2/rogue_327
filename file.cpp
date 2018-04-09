@@ -285,6 +285,8 @@ vector <string> splitBy(string str, char del){
         if ((str[x] == del || (x+1) == str.length()) && index < x){
             string cpy = str.substr(index, (x-index) + ((x+1) == str.length()));
             index = x + 1;
+            if (cpy[0] == ' ') cpy.erase(cpy.begin());
+            if (cpy[cpy.length()-1] == ' ') cpy.erase(cpy.end());
             ret.push_back(cpy);
         }
     }
@@ -293,7 +295,7 @@ vector <string> splitBy(string str, char del){
 }
 
 string getDatString(string fterm, string raw){
-    raw.erase(raw.begin(), raw.begin()+fterm.size());
+    raw.erase(raw.begin(), raw.begin()+fterm.size() + 1);
     return raw;
 }
 

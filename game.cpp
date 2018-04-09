@@ -3,8 +3,9 @@
 #include "stdlib.h"
 #include "unistd.h"
 #include "termios.h"
+#include "ncurses.h"
 
-#include "_win_unix.h"
+//#include "_win_unix.h"
 
 #include "algo.h"
 #include "game.h"
@@ -23,6 +24,10 @@ int turn = 0;
 #define STATE_REGEN  1
 
 int STATE_FLAG = STATE_NORMAL;
+
+void teleportMode(Dungeon * d){
+
+}
 
 int rollDice(Die d){
     int sum = d.offset;
@@ -93,6 +98,10 @@ int getInput(){
             case 'q':
             case 'Q':
                 return QUIT_GAME;
+            case 'f':
+                return FOG_OF_WAR;
+            case 't':
+                return TELEPORT;
         }
     }
 
@@ -136,6 +145,21 @@ void moveByStrategy(Entity * e, Dungeon * d, int * toX, int * toY){
     //temorary for error checking positions
     int _x = *toX, _y = *toY;
 
+    //get shortest distance from player
+    int shortCoord = getIndex(_x, _y);
+    int shortVal = d->_distanceMap[shortCoord];
+
+    for (int i = BOTTOM_LEFT; i <= TOP_RIGHT; ++i){
+        int currentCoord = getAdjacentIndex(_x, _y, i);
+        int currentVal = d->_distanceMap[currentCoord];
+        if (currentVal < shortVal){
+            shortVal = currentVal;
+            shortCoord = currentCoord;
+        }
+    }
+
+    *toX = getX(shortCoord);
+    *toY = getY(shortCoord);
 }
 
 void updatePcMap(Dungeon * d){
@@ -240,6 +264,10 @@ void allowMove(Entity * e, Dungeon ** d){
                 break;
 
                 case QUIT_GAME: config._run = 0; return;
+
+                case FOG_OF_WAR: (*d)->fogOfWar = !(*d)->fogOfWar; break;
+                case TELEPORT: teleportMode(*d); break;
+
                 default: acceptKey = 0;
             }
 
@@ -260,8 +288,12 @@ void allowMove(Entity * e, Dungeon ** d){
             toY = _y;
         }
 
+        calcDistMap(*d, true);
+
     } else {
-        moveByStrategy(e, *d, &toX, &toY);   
+        mvprintw(e->y, e->x, "%c", getSymbol((*d)->screen[(e->x%DUNGEON_WIDTH) + (e->y*DUNGEON_WIDTH)]));
+        moveByStrategy(e, *d, &toX, &toY);
+
     }
 
     Entity * victim = attack(e, *d);

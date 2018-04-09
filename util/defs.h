@@ -47,6 +47,10 @@
 #define ESCAPE          40
 
 #define QUIT_GAME       50
+
+#define FOG_OF_WAR      60
+#define TELEPORT        61
+
 #define INVALID_KEY     -1
 
 #endif

@@ -23,6 +23,8 @@ to check neighboring nodes. See dungeon.c
 Player movement:
 Number Keys
 'q' quits game
+'f' toggles fog-of-war
+'t' teleport mode
 
 Monster movement:
 Currently uses distance map and moves towards lowest weight. Odd bug where monsters teleport
@@ -31,8 +33,10 @@ into the corner or move too quickly towards the player.
 Events:
 A priority queue is added too, popped and updated with each action executed. See game.c
 
-Weird string bug while parsing, not sure if its a quirk with visual studio code's intellisence
-
-
 Backlogged a bit, monsters may not generate correctly
+
+
+BUGS:
+Weird string bug while parsing, not sure if its a quirk with visual studio code's intellisence [RESOLVED]
 Monster movement broken while I refactor some classes.
+Dungeon requires one move before rendering correctly.
