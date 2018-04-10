@@ -1,9 +1,10 @@
-#include <stdio.h>
+//#include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
 
 #include "_win_unix.h"
 
+/*
 #ifdef __CYGWIN
 
 int getch(void)
@@ -20,3 +21,4 @@ int getch(void)
 }
 
 #endif
+*/

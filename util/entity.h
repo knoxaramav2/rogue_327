@@ -25,6 +25,7 @@ class Entity{
     char symbol;
     int color;
     int x, y;
+    int lastX, lastY;
     int lastPcX, lastPcY;
 
     //monster attributes

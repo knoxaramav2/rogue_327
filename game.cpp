@@ -1,8 +1,8 @@
 #include "math.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "unistd.h"
-#include "termios.h"
+//#include "unistd.h"
+//#include "termios.h"
 #include "ncurses.h"
 
 //#include "_win_unix.h"
@@ -291,14 +291,13 @@ void allowMove(Entity * e, Dungeon ** d){
         calcDistMap(*d, true);
 
     } else {
-        mvprintw(e->y, e->x, "%c", getSymbol((*d)->screen[(e->x%DUNGEON_WIDTH) + (e->y*DUNGEON_WIDTH)]));
         moveByStrategy(e, *d, &toX, &toY);
-
     }
 
     Entity * victim = attack(e, *d);
 
-    //printf("%c [%d,%d] => [%d,%d]\r\n", e->symbol, fromX, fromY, toX, toY);
+    e->lastX = e->x;
+    e->lastY = e->y;
     e->x = toX;
     e->y = toY;
 
@@ -415,12 +414,14 @@ void updateTurn(Dungeon ** d){
         Entity * e = queue->e;
         int val = queue->val;
 
-        //printf("Turn %d\r\n", turn);
-        updateScreen(*d);
+        if (e == (*d)->player){
+            updateScreen(*d);
+            updatePcMap(*d);
+        }
+
         allowMove(e, d);
+
         updateScreen(*d);
-        //renderScreen(*d);
-        updatePcMap(*d);
 
         if (STATE_FLAG == STATE_REGEN){
             STATE_FLAG = STATE_NORMAL;

@@ -31,3 +31,5 @@
 4/1/18  Added colors, fixed string error
 4/1/18  Changed monster template
 4/8/18  Fixed monster visibility bug
+4/8/18  Added Console class to make screen work easier
+4/8/18  Deperecated _win_unix.h

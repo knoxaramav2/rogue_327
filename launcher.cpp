@@ -14,27 +14,37 @@
 #include "game.h"
 
 Config config;
+Console __console;
 
 void printHelp(){
-    printf("---HELP---\r\n");
 
-    printf("-h       Print this text\r\n");
-    printf("--save   Enable saving\r\n");
-    printf("-s       Enable saving\r\n");
-    printf("--load   Load game\r\n");
-    printf("-l       Load game\r\n");
-    printf("--nummon [integer]\r\n");
-    printf("\n\n\r");
+    clear();
+
+    mvprintw(0, 0, "--HELP--");
+
+    mvprintw(1, 0, "-h       Print this text");
+    mvprintw(2, 0, "--save   Enable saving");
+    mvprintw(3, 0, "-s       Enable saving");
+    mvprintw(4, 0, "--load   Load game");
+    mvprintw(5, 0, "-l       Load game");
+    mvprintw(6, 0, "--nummon [integer]");
+
+    refresh();
 }
 
 void printCmdErr(int err, char * msg){
+
+    clear();
+
     static char messages [8][128] = {
         "Switches must start with one to two '-''s\0", 
         "Unrecognized option\0",
         "Parameter must be an integer"
     };
 
-    printf("(Err %d) %s [%s]\r\n", err, messages[err], msg);
+    mvprintw(0, 0, "(Err %d) %s [%s]", err, messages[err], msg);
+
+    refresh();
 }
 
 //read command line arguments
@@ -102,7 +112,9 @@ int main(int argc, char ** argv){
     srand(time(0));
 
     if (config._run == 0){
-        printf("Argument errors found; quitting\r\n");
+        mvprintw(0, 0, "Argument errors found; quitting");
+        //printf("Argument errors found; quitting\r\n");
+        endwin();
         return -1;
     }
 
@@ -121,25 +133,9 @@ int main(int argc, char ** argv){
     }
 
     if (dungeon == 0){
-        printf("Unable to get dungeon\r\n");
+        //printf("Unable to get dungeon\r\n");
         return -1;
     }
-
-    initscr();
-    raw();
-    keypad(stdscr, 1);
-    noecho();
-    curs_set(0);
-    start_color();
-
-    init_pair(COLOR_BLACK, COLOR_WHITE, COLOR_BLACK);
-    init_pair(COLOR_RED, COLOR_RED, COLOR_BLACK);
-    init_pair(COLOR_GREEN, COLOR_GREEN, COLOR_BLACK);
-    init_pair(COLOR_YELLOW, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(COLOR_BLUE, COLOR_BLUE, COLOR_BLACK);
-    init_pair(COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
-    init_pair(COLOR_CYAN, COLOR_CYAN, COLOR_BLACK);
-    init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
 
     //play game
     setupGameState(dungeon);
@@ -159,15 +155,13 @@ int main(int argc, char ** argv){
 
     updateScreen(dungeon);
 
-    //renderScreen(dungeon);
+    endwin();
 
-    printf("Game over\r\n");
+    //printf("Game over\r\n");
     
     if (config.save){
         saveGame(dungeon);
     }
-
-    endwin();
 
     return 0;
 }

@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
+//#include <stdio.h>
 
 #include "algo.h"
 #include "console.h"
@@ -242,7 +242,7 @@ void calcDistMap(Dungeon * d, int allowTunnel){
             if (qn == 0 || aIdx < 0) continue; //not available
 
             if (getSymbol(d->screen[aIdx]) == ROCK_SPACE){
-                printf("%c", getSymbol(d->screen[aIdx]));
+                //printf("%c", getSymbol(d->screen[aIdx]));
             }
 
             int adjWght = getSymbol(d->screen[aIdx]) == ROCK_SPACE ? getHardness(d->screen[aIdx]) : 1;

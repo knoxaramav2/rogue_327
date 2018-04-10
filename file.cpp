@@ -341,7 +341,7 @@ void loadProfiles(vector <string> lines){
             def.name = getDatString(terms[0], str);
             inst[_name]++;
 
-            printf("NAME = %s\n", def.name.c_str());
+            //printf("NAME = %s\n", def.name.c_str());
         } else if (terms[0] == "DESC"){
             inst[_desc]++;
             for (++i;i < lines.size() ;++i){
@@ -350,7 +350,7 @@ void loadProfiles(vector <string> lines){
                 def.description += lines[i] + "\n";
             }
 
-            printf("DESC = %s\n", def.description.c_str());
+            //printf("DESC = %s\n", def.description.c_str());
         } else if (terms[0] == "COLOR"){
 
             inst[_color]++;
@@ -372,10 +372,10 @@ void loadProfiles(vector <string> lines){
             inst[_speed]++;
             Die d = getDie(terms[1]);
             def.speed = d;
-            printf("SPEED = %d + %dd%d\n", 
+            /*printf("SPEED = %d + %dd%d\n", 
                 def.speed.offset,
                 def.speed.rolls,
-                def.speed.range);
+                def.speed.range);*/
         } else if (terms[0] == "ABIL"){
             inst[_abil]++;
             //def._abil = getDie(terms[1]);
@@ -386,21 +386,21 @@ void loadProfiles(vector <string> lines){
         } else if (terms[0] == "HP"){
             inst[_hp]++;
             def.health = getDie(terms[1]);
-            printf("HP = %d + %dd%d\n", 
+            /*printf("HP = %d + %dd%d\n", 
                 def.health.offset,
                 def.health.rolls,
-                def.health.range);
+                def.health.range);*/
         } else if (terms[0] == "DAM"){
             inst[_dmg]++;
             def.attack = getDie(terms[1]);
-            printf("DAM = %d + %dd%d\n", 
+            /*printf("DAM = %d + %dd%d\n", 
                 def.attack.offset,
                 def.attack.rolls,
-                def.attack.range);
+                def.attack.range);*/
         } else if (terms[0] == "RRTY"){
             inst[_rare]++;
             def.rarity = atoi(terms[1].c_str());
-            printf("RRTY = %d\n", def.rarity);
+            //printf("RRTY = %d\n", def.rarity);
         } else {
 
         }
@@ -413,7 +413,7 @@ void loadMonsterDefs(){
 
     ifstream i(path);
     if (!i){
-        printf("Monster file not found at %s\r\n", path.c_str());
+        //printf("Monster file not found at %s\r\n", path.c_str());
         return;
     }
 

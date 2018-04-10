@@ -1,5 +1,5 @@
 #include <string.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include <ncurses.h>
 
 #include "dungeon.h"
@@ -9,6 +9,57 @@
 #include "defs.h"
 
 //Config config;
+//Console __console;
+
+WINDOW * createWindow(int height, int width, int yOffset, int xOffset){
+    WINDOW * ret;
+
+    //ret = newwin(height, width, yOffset, xOffset);
+    ret = newwin(height, width, yOffset, xOffset);
+    box(ret, 0, 0);
+
+    return ret;
+}
+
+Console::Console(){
+    //initscr();
+    screen = newterm(NULL, stdin, stdout);
+
+    cbreak();
+    keypad(stdscr, true);
+    noecho();
+    curs_set(false);
+    start_color();
+
+    init_pair(COLOR_BLACK, COLOR_WHITE, COLOR_BLACK);
+    init_pair(COLOR_RED, COLOR_RED, COLOR_BLACK);
+    init_pair(COLOR_GREEN, COLOR_GREEN, COLOR_BLACK);
+    init_pair(COLOR_YELLOW, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(COLOR_BLUE, COLOR_BLUE, COLOR_BLACK);
+    init_pair(COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(COLOR_CYAN, COLOR_CYAN, COLOR_BLACK);
+    init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
+
+
+    //gameWindow = createWindow(DUNGEON_HEIGHT, DUNGEON_WIDTH, 0, 0);
+    gameWindow = createWindow(DUNGEON_HEIGHT, DUNGEON_WIDTH - 1, 0, 0);
+    menuWindow = createWindow(5, DUNGEON_WIDTH, 0, DUNGEON_HEIGHT);
+
+    move(0,0);
+    clear();
+    refresh();
+}
+
+Console::~Console(){
+    delscreen(screen);
+}
+
+void Console::update(){
+    clear();
+    wrefresh(gameWindow);
+    //wrefresh(menuWindow);
+}
+
 
 int getLastDigit(unsigned v){
     return v%10;
@@ -36,27 +87,12 @@ int printBoarder(){
     }
 }
 
-//Renderers
 /*
-int clearScreen(){
-    //TODO use ascii escape method instead
-    int i = 0;
-    for (; i < 30; ++i){
-        printf("\n");
-    }
-
-    printf("\r");
-}*/
-
 int renderScreen(Dungeon * dungeon){
-
-    printBoarder();
 
     int i = 0;
     for (; i < DUNGEON_WIDTH * DUNGEON_HEIGHT; ++i){
-        if (i % DUNGEON_WIDTH == 0){
-            printf("\r\n");
-        }
+
         unsigned cell = (i%(DUNGEON_WIDTH)) + ((i/DUNGEON_WIDTH) * DUNGEON_WIDTH);
         Player * player = dungeon->player;
 
@@ -77,43 +113,42 @@ int renderScreen(Dungeon * dungeon){
     //render text below
     printf("\r\n|\r\n|\r\n|\r\n");
     fflush(stdout);
-}
+}*/
 
 int renderDistance(Dungeon * dungeon, int allowTunnel){
 
-    printBoarder();
-
     int i = 0;
     for (; i < DUNGEON_WIDTH * DUNGEON_HEIGHT; ++i){
-        if (i % DUNGEON_WIDTH == 0){
-            printf("\r\n");
-        }
-        unsigned cell = (i%(DUNGEON_WIDTH)) + ((i/DUNGEON_WIDTH) * DUNGEON_WIDTH);
-        Entity * player = dungeon->player;
 
+        int x = getX(i);
+        int y = getY(i);
+
+        Entity * player = dungeon->player;
         char monster = hasMonster(dungeon, i);
         
+        mvwprintw(__console.gameWindow, y, x, "/");
+
         if (monster){
-            printf("\x1B[31m%c\x1B[0m", monster);
-        } else if (CELL(player->x, player->y) == cell){
-            printf("\x1B[32m@\x1B[0m");
+            mvwprintw(__console.gameWindow, y, x, "M");
+        } else if (CELL(player->x, player->y) == i){
+            mvwprintw(__console.gameWindow, y, x, "P");
         } else {
-            if (allowTunnel == 0 && getHardness(dungeon->screen[cell]) > 1)
-                printf(" ");
+            if (allowTunnel == 0 && getHardness(dungeon->screen[i]) > 1)
+                mvwprintw(__console.gameWindow, y, x, "^");
             else
-                printf("%d", getLastDigit(dungeon->_distanceMap[cell]));
+                mvwprintw(__console.gameWindow, y, x, "%d", getLastDigit(dungeon->_distanceMap[i]));
         }
+
+        //if (i % DUNGEON_WIDTH == 0)
+            //wrefresh(stdscr);
     }
-
-    //render actors
-
-
-    //render text below
-    printf("\n|\n|\n|\r\n");
-    fflush(stdout);
 }
 
 void updateScreen(Dungeon * d){
+
+    renderDistance(d, false);
+    __console.update();
+    return;
 
     Player * p = d->player;
     unsigned * screen = d->screen;
