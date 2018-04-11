@@ -1,9 +1,11 @@
 #include "math.h"
 #include "stdio.h"
 #include "stdlib.h"
-//#include "unistd.h"
-//#include "termios.h"
 #include "ncurses.h"
+#include <string>
+#include <vector>
+
+using namespace std;
 
 //#include "_win_unix.h"
 
@@ -20,14 +22,11 @@
 TurnItem * queue = nullptr;
 int turn = 0;
 
-#define STATE_NORMAL 0
-#define STATE_REGEN  1
+#define STATE_NORMAL    0
+#define STATE_REGEN     1
+#define STATE_NON_MOVE  2
 
 int STATE_FLAG = STATE_NORMAL;
-
-void teleportMode(Dungeon * d){
-
-}
 
 int rollDice(Die d){
     int sum = d.offset;
@@ -42,9 +41,8 @@ int rollDice(Die d){
 int getInput(){
 
     while(1){
-        char c = getch();
-        char c2 = 0;
-        char c3 = 0;
+        int c = wgetch(__console.gameWindow);
+        wrefresh(__console.gameWindow);
 
         //printf("<<%d %d %d>>\r\n", c, c2, c3);
         //fflush(stdout);
@@ -87,11 +85,20 @@ int getInput(){
             case 'm':
                 return LIST_MONSTERS;
 
-            case 27:
-                return SCROLL_UP;
-            case 28:
-                return SCROLL_DOWN;
-
+            case 27:{
+                int k = wgetch(__console.gameWindow);
+                
+                if (k == 91){
+                    k = wgetch(__console.gameWindow);
+                    if (k==65) return UP_ARROW;
+                    if (k==66) return DOWN_ARROW;
+                    if (k==67) return RIGHT_ARROW;
+                    if (k==68) return LEFT_ARROW;
+                } else if (k == 27){
+                    return ESCAPE;
+                }
+            }
+            return INVALID_KEY;
             case 91:
                 return ESCAPE;
 
@@ -102,10 +109,128 @@ int getInput(){
                 return FOG_OF_WAR;
             case 't':
                 return TELEPORT;
+            case 'r':
+                return RANDOM;
         }
     }
 
     return INVALID_KEY;
+}
+
+void monsterDisplayMode(Dungeon * d){
+
+    //while(true){};
+
+    int scrollPos = 0;
+    vector <string> list;
+
+    for (int i = 0; i < config.numNpc; ++i){
+        list.push_back(
+            getRelativeString(
+                d->player,
+                d->npcs[i]
+            ));
+    }
+
+    while(true){
+        __console.displayMonsterStats(list, scrollPos);
+
+        int i = getInput();
+
+        switch(i){
+            case UP_ARROW: --scrollPos; break;
+            case DOWN_ARROW: ++scrollPos; break;
+            case ESCAPE: 
+                renderMap(getActiveMap(d));
+            return;
+        }
+
+    }
+}
+
+void teleportMode(Dungeon * d){
+
+    char c;
+
+    Player * p = d->player;
+    unsigned * map = getActiveMap(d);
+    int x = p->x;
+    int y = p->y;
+    int _x = x;
+    int _y = y;
+
+    char lastElement;
+    bool wait = true;
+    bool random = false;
+
+    do{
+        lastElement = getSymbol(map[CELL(x, y)]);
+
+        char result = getInput();
+
+        switch(result){
+
+            case BOTTOM_LEFT: 
+                --_x;
+                ++_y;
+            break;
+            case BOTTOM_MIDDLE: 
+                ++_y;
+            break;
+            case BOTTOM_RIGHT: 
+                ++_x;
+                ++_y;
+            break;
+            case MIDDLE_LEFT: 
+                --_x;
+            break;
+            case MIDDLE_RIGHT: 
+                ++_x;
+            break;
+            case TOP_LEFT: 
+                --_x;
+                --_y;
+            break;
+            case TOP_MIDDLE: 
+                --_y;
+            break;
+            case TOP_RIGHT: 
+                ++_x;
+                --_y;
+            break;
+
+            case TELEPORT:
+                wait = false;
+            break;
+            case RANDOM:
+                wait=false;
+                random = true;
+            break;
+        }
+
+        mvwprintw(__console.gameWindow, y, x, "%c", lastElement);
+        mvwprintw(__console.gameWindow, _y, _x, "*");
+        y = _y;
+        x = _x;
+
+    } while(wait);
+
+    //repair
+    lastElement = mvwinch(__console.gameWindow, y, x) & A_CHARTEXT;
+    mvwprintw(__console.gameWindow, p->y, p->x, "%c", lastElement);
+
+    int toX = x;
+    int toY = y;
+
+    if (random){
+        toX = randIn(1, DUNGEON_WIDTH-2);
+        toY = randIn(1, DUNGEON_HEIGHT-2);
+    }
+
+    p->x = toX;
+    p->y = toY;
+
+    mvwprintw(__console.gameWindow, p->y, p->x, "%c", "@");
 }
 
 void tunnelAt(Dungeon * d, int coord){
@@ -123,7 +248,7 @@ void tunnelAt(Dungeon * d, int coord){
 }
 
 Entity * attack(Entity * attacker, Dungeon *d){
-    Entity * victim = 0;
+    Entity * victim = NULL;
 
 
     return victim;
@@ -265,8 +390,19 @@ void allowMove(Entity * e, Dungeon ** d){
 
                 case QUIT_GAME: config._run = 0; return;
 
-                case FOG_OF_WAR: (*d)->fogOfWar = !(*d)->fogOfWar; break;
-                case TELEPORT: teleportMode(*d); break;
+                case FOG_OF_WAR:
+                    (*d)->fogOfWar = !(*d)->fogOfWar; 
+                    renderMap((*d)->fogOfWar ? 
+                        (*d)->player->playerMap :
+                        (*d)->screen);
+                    STATE_FLAG = STATE_NON_MOVE;
+                    break;
+                case TELEPORT: teleportMode(*d); return;
+                case LIST_MONSTERS:
+                    STATE_FLAG = STATE_NON_MOVE;
+                    monsterDisplayMode((*d));
+                    return;
+                break;
 
                 default: acceptKey = 0;
             }
@@ -300,6 +436,8 @@ void allowMove(Entity * e, Dungeon ** d){
     e->lastY = e->y;
     e->x = toX;
     e->y = toY;
+
+    updateMove(*d, e);
 
     return;
 }
@@ -378,7 +516,7 @@ void spawnPlayers(Dungeon * d){
                 mx = -1;
         } while (mx < 0);
 
-        MonsterDefinition def = 
+        MonsterDescription def = 
             _monsterReg.registry[randIn(0, _monsterReg.registry.size())];
         
         //determine npcs type
@@ -421,17 +559,19 @@ void updateTurn(Dungeon ** d){
 
         allowMove(e, d);
 
-        updateScreen(*d);
-
         if (STATE_FLAG == STATE_REGEN){
             STATE_FLAG = STATE_NORMAL;
             turn = 0;
-            return;
+        } else if (STATE_FLAG == STATE_NON_MOVE){
+            STATE_FLAG = STATE_NORMAL;
+            --turn;
+        } else {
+            pop();
+            queueTurn(e, val + (1000/e->speed));
         }
 
+        updateScreen(*d);
         
-        pop();
-        queueTurn(e, val + (1000/e->speed));
 
         //sleep(1);
     }

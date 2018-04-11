@@ -1,6 +1,7 @@
 #include <string.h>
 //#include <stdio.h>
 #include <ncurses.h>
+#include <unistd.h>
 
 #include "dungeon.h"
 #include "config.h"
@@ -11,12 +12,12 @@
 //Config config;
 //Console __console;
 
+using namespace std;
+
 WINDOW * createWindow(int height, int width, int yOffset, int xOffset){
     WINDOW * ret;
 
-    //ret = newwin(height, width, yOffset, xOffset);
     ret = newwin(height, width, yOffset, xOffset);
-    box(ret, 0, 0);
 
     return ret;
 }
@@ -25,10 +26,15 @@ Console::Console(){
     //initscr();
     screen = newterm(NULL, stdin, stdout);
 
+    if (screen == NULL){
+        return;
+    }
+
     cbreak();
-    keypad(stdscr, true);
     noecho();
-    curs_set(false);
+    keypad(stdscr, true);
+    
+    //curs_set(false);
     start_color();
 
     init_pair(COLOR_BLACK, COLOR_WHITE, COLOR_BLACK);
@@ -41,12 +47,12 @@ Console::Console(){
     init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
 
 
-    //gameWindow = createWindow(DUNGEON_HEIGHT, DUNGEON_WIDTH, 0, 0);
-    gameWindow = createWindow(DUNGEON_HEIGHT, DUNGEON_WIDTH - 1, 0, 0);
-    menuWindow = createWindow(5, DUNGEON_WIDTH, 0, DUNGEON_HEIGHT);
+    infoBar = createWindow(1, DUNGEON_WIDTH, 0, 0);
+    gameWindow = createWindow(DUNGEON_HEIGHT-1, DUNGEON_WIDTH - 1, 1, 0);
+    menuWindow = createWindow(2, DUNGEON_WIDTH, DUNGEON_HEIGHT, 0);
 
-    move(0,0);
     clear();
+    mvwprintw(infoBar, 0, 0, "INFO |");
     refresh();
 }
 
@@ -56,8 +62,32 @@ Console::~Console(){
 
 void Console::update(){
     clear();
+    wrefresh(infoBar);
     wrefresh(gameWindow);
-    //wrefresh(menuWindow);
+    wrefresh(menuWindow);
+    
+    box(gameWindow, 0, 0);
+}
+
+void Console::clearGameWindow(){
+    wclear(gameWindow);
+}
+
+void Console::displayMonsterStats(vector <string> stats, int yVal){
+
+    clearGameWindow();
+
+    if (yVal < 0)
+        yVal = 0;
+    if (yVal >= stats.size())
+        yVal = stats.size()-1;
+
+    for (int i = yVal; i < stats.size(); ++i){
+        mvwprintw(gameWindow, i+1, 2, "%s", stats[i].c_str());
+    }
+
+    wrefresh(gameWindow);
+    refresh();
 }
 
 
@@ -78,42 +108,6 @@ char hasMonster(Dungeon * d, int idx){
 
     return 0;
 }
-
-int printBoarder(){
-    int i = 1;
-
-    for(; i <= DUNGEON_WIDTH; ++i){
-        
-    }
-}
-
-/*
-int renderScreen(Dungeon * dungeon){
-
-    int i = 0;
-    for (; i < DUNGEON_WIDTH * DUNGEON_HEIGHT; ++i){
-
-        unsigned cell = (i%(DUNGEON_WIDTH)) + ((i/DUNGEON_WIDTH) * DUNGEON_WIDTH);
-        Player * player = dungeon->player;
-
-        char monster = hasMonster(dungeon, i);
-
-        if (monster){
-            printf("\x1B[31m%c\x1B[0m", monster);
-        } else if (CELL(player->x, player->y) == cell){
-            printf("\x1B[32m@\x1B[0m");
-        } else {
-            printf("%c", dungeon->screen[cell]);
-        }
-    }
-
-    //render actors
-
-
-    //render text below
-    printf("\r\n|\r\n|\r\n|\r\n");
-    fflush(stdout);
-}*/
 
 int renderDistance(Dungeon * dungeon, int allowTunnel){
 
@@ -144,45 +138,113 @@ int renderDistance(Dungeon * dungeon, int allowTunnel){
     }
 }
 
-void updateScreen(Dungeon * d){
 
-    renderDistance(d, false);
-    __console.update();
-    return;
+void updatePlayerMap(Dungeon * d){
 
+    unsigned * pMap = d->player->playerMap;
+    unsigned * dMap = d->screen;
     Player * p = d->player;
-    unsigned * screen = d->screen;
-    unsigned * pcScreen = p->playerMap;
 
     int minX = p->x >= 2  ? p->x - 2: 0;
     int minY = p->y >= 2  ? p->y - 2: 0;
     int maxX = p->x <= DUNGEON_WIDTH - 2 ? p->x + 2: DUNGEON_WIDTH;
     int maxY = p->y <= DUNGEON_HEIGHT - 2 ? p->y + 2: DUNGEON_HEIGHT - 1;
 
+    for (int x = minX; x <= maxX; ++x){
+        for (int y = minY; y <= maxY; ++y){
+            pMap[CELL(x, y)] = dMap[CELL(x,y)];
+        }
+    }
+}
+
+void updateAll(){
+
+}
+
+//patch hole left by moving monster as long as it was previously visible
+void updateMove(Dungeon * d, Entity * e){
+
+    Entity * p = d->player;
+
+    if (!isWithinBox(CELL(p->lastX, p->lastY), 2, 2, CELL(e->lastX, e->lastY)))
+        return;
+
+    mvwprintw(__console.gameWindow, e->lastY, e->lastX, "%c", getSymbol(d->screen[CELL(e->lastX, e->lastY)]));
+}
+
+void renderMap(unsigned * map){
+    wclear(__console.gameWindow);
+
+    for (int x = 1; x < DUNGEON_WIDTH; ++x){
+        for (int y = 1; y < DUNGEON_HEIGHT; ++y){
+            mvwprintw(__console.gameWindow, y, x, "%c", getSymbol(map[CELL(x, y)]));
+        }
+    }
+
+    box(__console.gameWindow, 0, 0);
+    refresh();
+}
+
+unsigned * getActiveMap(Dungeon * d){
+    return d->fogOfWar ? d->player->playerMap : d->screen;
+}
+
+void updateScreen(Dungeon * d){
+
+    //renderDistance(d, false);
+    //__console.update();
+    //return;
+
+    Player * p = d->player;
+    unsigned * screen = d->screen;
+    unsigned * pcScreen = p->playerMap;
+    unsigned * rScreen = NULL;
+
+    updatePlayerMap(d);
+
+    int minX, minY, maxX, maxY;
+
+    if (d->fogOfWar){
+        minX = p->x >= 2  ? p->x - 2: 0;
+        minY = p->y >= 2  ? p->y - 2: 0;
+        maxX = p->x <= DUNGEON_WIDTH - 2 ? p->x + 2: DUNGEON_WIDTH;
+        maxY = p->y <= DUNGEON_HEIGHT - 2 ? p->y + 2: DUNGEON_HEIGHT - 1;
+        rScreen = pcScreen;
+    } else {
+        minX = 2;
+        minY = 2;
+        maxX = DUNGEON_WIDTH - 2;
+        maxY = DUNGEON_HEIGHT - 2;
+        rScreen = screen;
+    }
+
     //place surrounding map
     for (int x = minX; x <= maxX; ++x){
         for (int y = minY; y <= maxY; ++y){
-            mvprintw(y, x, "%c", getSymbol(screen[(x%DUNGEON_WIDTH) + (y*DUNGEON_WIDTH)]));
-            //int idx = CELL(x, y);
-            //p->playerMap[qidx] = screen[idx];
+            mvwprintw(__console.gameWindow, y, x, "%c", getSymbol(rScreen[CELL(x, y)]));
         }
     }
 
     //draw monsters
     for(int i = 0; i < config.numNpc; ++i){
         Entity * e = d->npcs[i];
-        int c = randIn(0, e->colors.size());
-        attron(COLOR_PAIR(e->colors[c]));
-        mvprintw(e->y, e->x, "%c", e->symbol);
-        attroff(COLOR_PAIR(e->colors[c]));
+        int pCell = CELL(p->x, p->y);
+
+        //zone where player can see
+        if (isWithinBox(pCell, 2, 2, CELL(e->x, e->y)) || !d->fogOfWar){
+            int c = randIn(0, e->colors.size());
+            wattron(__console.gameWindow,COLOR_PAIR(e->colors[c]));
+            mvwprintw(__console.gameWindow, e->y, e->x, "%c", e->symbol);
+            wattroff(__console.gameWindow,COLOR_PAIR(e->colors[c]));
+        }        
     }
 
     //draw player
-    attron(COLOR_PAIR(COLOR_GREEN));
-    mvprintw(p->y, p->x, "@");
-    attroff(COLOR_PAIR(COLOR_GREEN));
+    wattron(__console.gameWindow,COLOR_PAIR(COLOR_GREEN));
+    mvwprintw(__console.gameWindow, p->y, p->x, "@");
+    wattroff(__console.gameWindow,COLOR_PAIR(COLOR_GREEN));
 
-    wrefresh(stdscr);
+    __console.update();
 }
 
 void initColors(){

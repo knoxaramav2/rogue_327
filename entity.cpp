@@ -48,6 +48,18 @@ Entity::Entity(char sym, int x, int y){
 
 }
 
+Monster::Monster(int x, int y, MonsterDescription md) : Entity(md.sym, x, y){
+    symbol = md.sym;
+    colors = md.colors;
+    attributes = md.attributes;
+    speed = rollDice(md.speed);
+    health = rollDice(md.health);
+    attack = md.attack;
+    rarity = md.rarity;
+    
+    description = md.description;
+}
+
 Player::Player(int x, int y) : Entity('@', x, y){
     playerMap = new unsigned [DUNGEON_HEIGHT * DUNGEON_WIDTH];
     memset(playerMap, 0, DUNGEON_HEIGHT * DUNGEON_WIDTH);
@@ -63,6 +75,6 @@ void destroyEntity(Entity * e){
     free(e);
 }
 
-int hasAttribute(Entity * e, unsigned char attr){
+bool hasAttribute(Entity * e, unsigned int attr){
     return e->attributes & attr;
 }

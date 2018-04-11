@@ -39,4 +39,8 @@ Backlogged a bit, monsters may not generate correctly
 BUGS:
 Weird string bug while parsing, not sure if its a quirk with visual studio code's intellisence [RESOLVED]
 Monster movement broken while I refactor some classes.
-Dungeon requires one move before rendering correctly.
+Dungeon requires one move before rendering correctly. [RESOLVED]
+
+Neat Things:
+isWithinBox (algo.cpp) Used for detecting things inside a radius of some point
+Console (console.h) Uses ncurses window system to fancy up the UI

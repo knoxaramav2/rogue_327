@@ -122,7 +122,8 @@ int main(int argc, char ** argv){
     
     Dungeon * dungeon = 0;
 
-    loadMonsterDefs();
+    loadDefinitions("monster");
+    loadDefinitions("object");
     //return 0;
 
     //determine load/save/new=

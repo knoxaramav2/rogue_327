@@ -51,6 +51,12 @@
 #define FOG_OF_WAR      60
 #define TELEPORT        61
 
+#define RANDOM          70
+#define UP_ARROW        71
+#define DOWN_ARROW      72
+#define LEFT_ARROW      73
+#define RIGHT_ARROW     74
+
 #define INVALID_KEY     -1
 
 #endif

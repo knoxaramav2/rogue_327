@@ -1,11 +1,58 @@
 #include <stdlib.h>
-#include <string.h>
-//#include <stdio.h>
+#include <string>
+#include <cmath>
+#include <cstring>
 
 #include "algo.h"
 #include "console.h"
 
 #include "defs.h"
+
+using namespace std;
+
+string getRelativeString(Entity * player, Entity * monster){
+    int dx = monster->x - player->x;
+    int dy = monster->y - player->y;
+
+    int ax = abs(dx);
+    int ay = abs(dy);
+
+    string ret(1, monster->symbol);
+    ret += " ";
+
+    if (ax != 0){
+        ret += to_string(ax);
+        ret += dx < 0 ?
+            " West" :
+            " East";
+        if (ay != 0)
+            ret += " , ";
+    }
+
+    if (ay != 0){
+        ret += to_string(ay);
+        ret += dy < 0 ?
+            " South" :
+            " North";
+    }
+
+    return ret;
+}
+
+//determine if trg is within box of size WxH
+bool isWithinBox(int boxIdx, int boxW, int boxH, int trgIdx){
+    int boxX = getX(boxIdx);
+    int boxY = getX(boxIdx);
+    int trgX = getX(trgIdx);
+    int trgY = getX(trgIdx);
+
+    int minX = boxX-boxW;
+    int maxX = boxX+boxW;
+    int minY = boxY-boxH;
+    int maxY = boxY+boxH;
+
+    return !(trgX < minX || trgX > maxX || trgY < minY || trgY > maxY);
+}
 
 bool isMonsterVisible(Dungeon * d, Entity * m){
 
@@ -282,4 +329,32 @@ int randIn(int min, int max){
         return max;
 
     return (rand()%(max-min)) + min;
+}
+
+
+//strings
+string toUpper(string raw){
+    string ret;
+
+    for (char c : raw){
+        if (c >= 'a' && c <= 'z')
+            ret += c - 32;
+        else 
+            ret += c;
+    }
+
+    return ret;
+}
+
+string toLower(string raw){
+    string ret;
+
+    for (char c : raw){
+        if (c >= 'A' && c <= 'Z')
+            ret += c + 32;
+        else 
+            ret += c;
+    }
+
+    return ret;
 }

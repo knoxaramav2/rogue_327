@@ -1,6 +1,8 @@
 #ifndef ALGO
 #define ALGO
 
+#include <string>
+
 #include "dungeon.h"
 
 class QueueNode{
@@ -27,5 +29,10 @@ int getIndex(int x, int y);
 int getAdjacentIndex(int x, int y, int i);
 bool isValidSpace(int pos);
 bool isValidSpace(int x, int y);
+bool isWithinBox(int boxIdx, int boxW, int boxH, int trgIdx);
+std::string getRelativeString(Entity * player, Entity * monster);
+
+std::string toUpper(std::string);
+std::string toLower(std::string);
 
 #endif

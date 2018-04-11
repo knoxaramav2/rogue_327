@@ -1,6 +1,8 @@
 #ifndef DUNGEON
 #define DUNGEON
 
+#include <vector>
+
 #include "entity.h"
 
 #define CELL(x,y) ((x%DUNGEON_WIDTH) + (y*DUNGEON_WIDTH))

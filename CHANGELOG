@@ -33,3 +33,9 @@
 4/8/18  Fixed monster visibility bug
 4/8/18  Added Console class to make screen work easier
 4/8/18  Deperecated _win_unix.h
+4/9/18  Fixed more ncurses bugs
+4/9/18  Proximity calc
+4/9/18  Fairly sure the monster multiplying thing is fixed
+4/9/18  Better fog of war
+4/9/18  Teleporting
+4/10/18 Streamlines monster/object parser

@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <cstring>
 #include <string>
-#include <string.h>
+#include <vector>
 #include <sys/stat.h>
 #include <fstream>
 
@@ -12,6 +13,7 @@
 #include "algo.h"
 
 MonsterRegistry _monsterReg;
+ItemRegistry _itemReg;
 
 using namespace std;
 
@@ -280,14 +282,16 @@ vector <string> splitBy(string str, char del){
     vector <string> ret;
 
     size_t index = 0;
+    string tmp;
 
     for (size_t x = 0; x <= str.length(); ++x){
-        if ((str[x] == del || (x+1) == str.length()) && index < x){
-            string cpy = str.substr(index, (x-index) + ((x+1) == str.length()));
-            index = x + 1;
-            if (cpy[0] == ' ') cpy.erase(cpy.begin());
-            if (cpy[cpy.length()-1] == ' ') cpy.erase(cpy.end());
-            ret.push_back(cpy);
+        char c = str[x];
+
+        if (c == del || x == str.length()){
+            ret.push_back(tmp);
+            tmp="";
+        } else {
+            tmp += c;
         }
     }
 
@@ -299,136 +303,104 @@ string getDatString(string fterm, string raw){
     return raw;
 }
 
-//Monsters
-void loadProfiles(vector <string> lines){
+string trimString(string s){
 
-    Entity ret = Entity(0,0,0);
+    if (s[0] == ' ')
+        s.erase(s.begin());
+    if (s[s.length()-1]==' ' || s[s.length()-1]=='\r')
+        s.pop_back();
 
-    enum offset {_name, _desc, _color, _speed, _abil, _hp, _dmg, _rare};
-    int inst [8] = {0};
-    
-    bool begin = false;
-
-    MonsterDefinition def;
-
-    for (int i = 0; i < lines.size(); ++i){
-        string str = lines[i];
-        if (str[str.size()-1] == '\r')
-            str.pop_back();
-        vector <string> terms = splitBy(str, ' ');
-
-        if (terms.size() == 0)
-            continue;
-
-        if (begin == false){
-            if (terms.size() != 2)
-                continue;
-            
-            begin = (terms[0] == "BEGIN" && terms[1] == "MONSTER");
-            if (begin)
-                def = MonsterDefinition();
-
-            continue;
-        } else {
-            if (terms[0] == "END"){
-                begin = false;
-                _monsterReg.registry.push_back(def);
-                continue;
-            }
-        }
-
-        if (terms[0] == "NAME"){
-            def.name = getDatString(terms[0], str);
-            inst[_name]++;
-
-            //printf("NAME = %s\n", def.name.c_str());
-        } else if (terms[0] == "DESC"){
-            inst[_desc]++;
-            for (++i;i < lines.size() ;++i){
-                if (lines[i][0] == '.')
-                    break;
-                def.description += lines[i] + "\n";
-            }
-
-            //printf("DESC = %s\n", def.description.c_str());
-        } else if (terms[0] == "COLOR"){
-
-            inst[_color]++;
-
-            for (int j = 1; j < terms.size(); ++j){
-                string clr = terms[j];
-
-                if (clr == "BLACK") def.colors.push_back(COLOR_WHITE);
-                else if (clr == "RED") def.colors.push_back(COLOR_RED);
-                else if (clr == "GREEN") def.colors.push_back(COLOR_GREEN);
-                else if (clr == "YELLOW") def.colors.push_back(COLOR_YELLOW);
-                else if (clr == "BLUE") def.colors.push_back(COLOR_BLUE);
-                else if (clr == "MAGENTA") def.colors.push_back(COLOR_MAGENTA);
-                else if (clr == "CYAN") def.colors.push_back(COLOR_CYAN);
-                else if (clr == "WHITE") def.colors.push_back(COLOR_WHITE);
-
-            }
-        } else if (terms[0] == "SPEED"){
-            inst[_speed]++;
-            Die d = getDie(terms[1]);
-            def.speed = d;
-            /*printf("SPEED = %d + %dd%d\n", 
-                def.speed.offset,
-                def.speed.rolls,
-                def.speed.range);*/
-        } else if (terms[0] == "ABIL"){
-            inst[_abil]++;
-            //def._abil = getDie(terms[1]);
-            /*printf("ABIL = %d + %dd%d\n", 
-                def.speed.offset,
-                def.speed.rolls,
-                def.speed.range);*/
-        } else if (terms[0] == "HP"){
-            inst[_hp]++;
-            def.health = getDie(terms[1]);
-            /*printf("HP = %d + %dd%d\n", 
-                def.health.offset,
-                def.health.rolls,
-                def.health.range);*/
-        } else if (terms[0] == "DAM"){
-            inst[_dmg]++;
-            def.attack = getDie(terms[1]);
-            /*printf("DAM = %d + %dd%d\n", 
-                def.attack.offset,
-                def.attack.rolls,
-                def.attack.range);*/
-        } else if (terms[0] == "RRTY"){
-            inst[_rare]++;
-            def.rarity = atoi(terms[1].c_str());
-            //printf("RRTY = %d\n", def.rarity);
-        } else {
-
-        }
-    }
+    return s;
 }
 
-void loadMonsterDefs(){
+//bodge-erific!
+
+class LineItem{
+
+    public:
+
+    string key;
+    vector <string> values;
+};
+
+class GenProfile{
+
+    public:
+
+    GenProfile(){
+        failed = false;
+    }
+
+    vector <LineItem> items;
+    bool failed;
+};
+
+bool checkProfileHeader(string header, string expectedName){
+    string expectedHeader = "RLG327 " + expectedName + " DESCRIPTION 1";
+    return expectedHeader == header;
+}
+
+bool checkEntryHeader(string header, string expectedName){
+    string expectedHeader = "BEGIN " + expectedName;
+    return expectedHeader == header;
+}
+
+LineItem getLineItem(string raw){
+
+}
+
+GenProfile getProfile(vector<string> &lines, int &idx){
+
+}
+
+//parse all known fields, regardless of intended type
+vector <GenProfile> getProfiles(vector<string> list, string profileName){
+    vector <GenProfile> profiles;
+
+    //return if file format header does not match
+    if (!checkProfileHeader(list[0], profileName)){
+        return profiles;
+    }
+
+    //create key, value pair and get LineItem
+    int idx = 1;
+    for (int i = 1; i < list.size(); ++i){
+        if (!checkEntryHeader(list[i], profileName))
+            continue;
+        profiles.push_back(getProfile(list, idx));
+    }
+
+    return profiles;
+}
+
+void loadMonster(vector<GenProfile> profiles){
+
+}
+
+void loadObjects(vector<GenProfile> profiles){
+
+}
+
+void loadDefinitions(string profile){
     string path = getGameDir();
-    path += "monster_desc.txt";
+    path += profile + "_desc.txt";
+
+    string profileString = toUpper(profile);
 
     ifstream i(path);
     if (!i){
-        //printf("Monster file not found at %s\r\n", path.c_str());
         return;
     }
 
-    //state checks
-    bool hasMeta = false;
-    bool readMonster = false;
-    bool nextMonster = false;
-
     vector <string> lines;
 
+    //load file
     for(string line; getline(i, line);){
-        lines.push_back(line);
+        lines.push_back(trimString(line));
     }
 
-    loadProfiles(lines);
+    //get key, value parsed lines
+    vector <GenProfile> profiles = getProfiles(lines, profileString);
 
     i.close();
-} 
+}
