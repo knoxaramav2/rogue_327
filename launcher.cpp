@@ -134,10 +134,6 @@ void cmd(int argc, char ** argv){
 //UTIL
 int main(int argc, char ** argv){
 
-    test();
-
-    return 0;
-
     #ifdef __CYGWIN
     //printf("CYGWIN DEPENDANT\r\n");
     //fflush(stdout);
@@ -158,10 +154,10 @@ int main(int argc, char ** argv){
     
     Dungeon * dungeon = 0;
 
-    //loadDefinitions("monster");
-    //loadDefinitions("object");
-    loadTestItems();
-    //return 0;
+    loadDefinitions("monster");
+    loadDefinitions("object");
+    //loadTestItems();
+    return 0;
 
     //determine load/save/new=
     if (config.load){

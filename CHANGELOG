@@ -41,3 +41,4 @@
 4/10/18 Streamlines monster/object 
 4/11/18 Adding in test loader for monsters/objects while I fix the improved loader
 4/11/18 Items rendering now, very high latency
+4/15/18 Removed user tunneling

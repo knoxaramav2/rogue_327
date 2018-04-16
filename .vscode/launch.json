@@ -5,15 +5,15 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/dungeon.exe",
+            "program": "${workspaceRoot}/dungeon",
             "args": ["--nummon", "10", "-s"],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}",
             "environment": [],
             "externalConsole": true,
             "MIMode": "gdb",
-            "miDebuggerPath": "C:/cygwin64/bin/gdb.exe",
-            //"miDebuggerPath": "gdb",
+            //"miDebuggerPath": "C:/cygwin64/bin/gdb.exe",
+            "miDebuggerPath": "gdb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",

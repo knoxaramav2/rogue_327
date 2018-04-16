@@ -278,6 +278,16 @@ Die getDie(string raw){
     return d;
 }
 
+string trimString(string s){
+
+    if (s[0] == ' ')
+        s.erase(s.begin());
+    if (s[s.length()-1]==' ' || s[s.length()-1]=='\r')
+        s.pop_back();
+
+    return s;
+}
+
 vector <string> splitBy(string str, char del){
     vector <string> ret;
 
@@ -287,7 +297,7 @@ vector <string> splitBy(string str, char del){
     for (size_t x = 0; x <= str.length(); ++x){
         char c = str[x];
 
-        if (c == del || x == str.length()){
+        if ((c == del || x == str.length()) && tmp.size()>0){
             ret.push_back(tmp);
             tmp="";
         } else {
@@ -303,15 +313,7 @@ string getDatString(string fterm, string raw){
     return raw;
 }
 
-string trimString(string s){
 
-    if (s[0] == ' ')
-        s.erase(s.begin());
-    if (s[s.length()-1]==' ' || s[s.length()-1]=='\r')
-        s.pop_back();
-
-    return s;
-}
 
 //bodge-erific!
 
@@ -345,12 +347,71 @@ bool checkEntryHeader(string header, string expectedName){
     return expectedHeader == header;
 }
 
-LineItem getLineItem(string raw){
+LineItem getLineItem(string raw, bool concat){
+    LineItem li;
 
+
+    return li;
 }
 
-GenProfile getProfile(vector<string> &lines, int &idx){
+string getMultiLine(vector<string>&lines, int&i){
+    string descript;
 
+    for (++i; i < lines.size(); ++i){
+        if (trimString(lines[i]) == "."){
+            break;
+        }
+
+        descript += lines[i] + "\n";
+    }
+
+    return descript;
+}
+
+GenProfile getProfile(vector<string> &lines, int &i){
+    GenProfile gp;
+    bool began = false;
+
+    for (; i < lines.size(); ++i){
+        LineItem temp;
+        string line = lines[i];
+        vector <string> terms = splitBy(line, ' ');
+        string key;
+
+        if (terms.size() == 0)
+            continue;
+
+        if (!began){
+            if (terms[0] == "BEGIN")
+                began = true;
+            continue;
+        }
+        
+        if (terms[0] == "END"){
+
+            if (temp.key.size() != 0)
+                gp.items.push_back(temp);
+
+            return gp;
+        }   
+
+        key = terms[0];
+        terms.erase(terms.begin());
+        
+        temp.key = key;
+
+        //die options
+
+        //multiline
+        if (key == "DESC"){
+            temp.values.push_back(getMultiLine(lines, i));
+        }
+
+        //other
+        gp.items.push_back(temp);
+    }
+
+    return gp;
 }
 
 //parse all known fields, regardless of intended type

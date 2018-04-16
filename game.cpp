@@ -416,10 +416,8 @@ void allowMove(Entity * e, Dungeon ** d){
         } while(!acceptKey);
 
         //check for obstruction
-        if (getSymbol((*d)->screen[CELL(_x, _y)]) == ROCK_SPACE){
-            tunnelAt(*d, CELL(_x, _y));
-        } else {
-
+        if (getSymbol((*d)->screen[CELL(_x, _y)]) != ROCK_SPACE){
+            //tunnelAt(*d, CELL(_x, _y));
             toX = _x;
             toY = _y;
         }
