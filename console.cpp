@@ -90,6 +90,10 @@ void Console::displayMonsterStats(vector <string> stats, int yVal){
     refresh();
 }
 
+void Console::printInfo(string info){
+    wclear(infoBar);
+    printw("%s", info.c_str());
+}
 
 int getLastDigit(unsigned v){
     return v%10;
@@ -200,6 +204,8 @@ void updateScreen(Dungeon * d){
     unsigned * pcScreen = p->playerMap;
     unsigned * rScreen = NULL;
 
+    __console.printInfo("HP: " + to_string(p->health));
+
     updatePlayerMap(d);
 
     int minX, minY, maxX, maxY;
@@ -236,6 +242,19 @@ void updateScreen(Dungeon * d){
             wattron(__console.gameWindow,COLOR_PAIR(e->colors[c]));
             mvwprintw(__console.gameWindow, e->y, e->x, "%c", e->symbol);
             wattroff(__console.gameWindow,COLOR_PAIR(e->colors[c]));
+        }        
+    }
+
+    //draw items
+    for(int i = 0; i < d->items.size(); ++i){
+        Item * e = &d->items[i];
+        int pCell = CELL(p->x, p->y);
+
+        //zone where player can see
+        if (isWithinBox(pCell, 2, 2, CELL(e->x, e->y)) || !d->fogOfWar || true){
+            wattron(__console.gameWindow,COLOR_PAIR(e->color));
+            mvwprintw(__console.gameWindow, e->y, e->x, "%c", e->sym);
+            wattroff(__console.gameWindow,COLOR_PAIR(e->color));
         }        
     }
 

@@ -16,6 +16,38 @@
 Config config;
 Console __console;
 
+#include <panel.h>
+
+void test(){
+
+    int c;
+
+    for (int j=0; j < 20; ++j)
+        mvwprintw(__console.gameWindow, j, 0, "ABC | %d", j);
+    
+    //mvwprintw(twin, 0, 0, "DEF |");
+
+    scrollok(__console.gameWindow, true);
+
+    do{
+
+        int i = 0;
+        wrefresh(__console.gameWindow);
+        c = wgetch(__console.gameWindow);
+
+        switch(c){
+            case 'w': i = 1; break;
+            case 's': i = -1; break;
+        }
+
+        wscrl(__console.gameWindow, i);
+        
+
+
+    } while (c !='q');
+
+}
+
 void printHelp(){
 
     clear();
@@ -102,6 +134,10 @@ void cmd(int argc, char ** argv){
 //UTIL
 int main(int argc, char ** argv){
 
+    test();
+
+    return 0;
+
     #ifdef __CYGWIN
     //printf("CYGWIN DEPENDANT\r\n");
     //fflush(stdout);
@@ -122,8 +158,9 @@ int main(int argc, char ** argv){
     
     Dungeon * dungeon = 0;
 
-    loadDefinitions("monster");
-    loadDefinitions("object");
+    //loadDefinitions("monster");
+    //loadDefinitions("object");
+    loadTestItems();
     //return 0;
 
     //determine load/save/new=
@@ -141,6 +178,7 @@ int main(int argc, char ** argv){
     //play game
     setupGameState(dungeon);
     spawnPlayers(dungeon);
+    spawnItems(dungeon);
 
     calcDistMap(dungeon, 0);
 

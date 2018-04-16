@@ -15,11 +15,93 @@
 #include <vector>
 
 
+class Die{
 
-struct Die{
+    public:
+
+    Die();
+    Die(int offset, int rolls, int range);
+
     int rolls;
     int offset;
     int range;
+};
+
+enum ItemType{
+    INVALID,
+    WEAPON,
+    OFFHAND,
+    RANGED,
+    ARMOR,
+    HELMET,
+    CLOAK,
+    GLOVES,
+    BOOTS,
+    RING,
+    AMULET,
+    LIGHT,
+    SCROLL,
+    BOOK,
+    FLASK,
+    GOLD,
+    AMMUNITION,
+    FOOD,
+    WAND,
+    CONTAINER,
+    STACK
+};
+
+class ItemDescription{
+
+    public:
+
+    std::string name;
+    std::string description;
+    ItemType type;
+    int color;
+    Die hitBonus;
+    Die damageBonus;
+    Die defenseBonus;
+    Die weight;
+    Die speedBonus;
+    Die dodgeBonus;
+    Die specialAttribute;
+    Die value;
+    bool isArtifact;
+    int rarity;
+
+};
+
+class Item{
+
+    public:
+
+    Item();
+    Item(ItemDescription);
+
+    std::string name;
+    std::string description;
+    ItemType type;
+    char sym;
+    int color;
+    int hitBonus;
+    int damageBonus;
+    int defenseBonus;
+    int weight;
+    int speedBonus;
+    int dodgeBonus;
+    int specialAttribute;
+    int value;
+    bool isArtifact;
+    int rarity;
+
+    //for on map view
+    int x, y;
+};
+
+class ItemRegistry{
+    public:
+    std::vector <ItemDescription> registry;
 };
 
 class Entity{
@@ -67,6 +149,31 @@ class Monster: public Entity{
     std::string description;
 };
 
+//equiptment slots
+enum EquiptSlots{
+    _WEAPON,
+    _OFFHAND,
+    _ARMOR,
+    _HELM,
+    _CLOAK,
+    _GLOVES,
+    _BOOTS,
+    _AMULET,
+    _LIGHT,
+    _RING0,
+    _RING1,
+    _CARRY0,
+    _CARRY1,
+    _CARRY2,
+    _CARRY3,
+    _CARRY4,
+    _CARRY5,
+    _CARRY6,
+    _CARRY7,
+    _CARRY8,
+    _CARRY9
+};
+
 class Player: public Entity{
 
     public:
@@ -75,6 +182,9 @@ class Player: public Entity{
     ~Player();
 
     unsigned * playerMap;
+
+    //slots
+    Item weapon;
 };
 
 
@@ -83,78 +193,6 @@ class MonsterRegistry{
     public:
     std::vector <MonsterDescription> registry;
 
-};
-
-
-enum ItemType{
-    WEAPON,
-    OFFHAND,
-    RANGED,
-    ARMOR,
-    HELMET,
-    CLOAK,
-    GLOVES,
-    BOOTS,
-    RING,
-    AMULET,
-    LIGHT,
-    SCROLL,
-    BOOK,
-    FLASK,
-    GOLD,
-    AMMUNITION,
-    FOOD,
-    WAND,
-    CONTAINER
-};
-
-class ItemDescription{
-
-    public:
-
-    Item(ItemDescription);
-
-    std::string name;
-    std::string description;
-    ItemType type;
-    int color;
-    Die hitBonus;
-    Die damageBonus;
-    Die defenseBonus;
-    Die weight;
-    Die speedBonus;
-    Die specialAttribute;
-    Die value;
-    bool isArtifact;
-    int rarity;
-
-};
-
-class Item{
-
-    public:
-
-    Item(ItemDescription);
-
-    std::string name;
-    std::string description;
-    ItemType type;
-    int color;
-    int hitBonus;
-    int damageBonus;
-    int defenseBonus;
-    int weight;
-    int speedBonus;
-    int specialAttribute;
-    int value;
-    bool isArtifact;
-    int rarity;
-
-};
-
-class ItemRegistry{
-    public:
-    std::vector <ItemDescription> registry;
 };
 
 extern MonsterRegistry _monsterReg;
@@ -166,5 +204,7 @@ bool hasAttribute(Entity * e, unsigned int);
 void setAttribute(Entity * e, unsigned int);
 
 int rollDice(Die d);
+
+void loadTestItems();
 
 #endif

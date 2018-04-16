@@ -22,6 +22,7 @@ class Console{
     void update();
     void clearGameWindow();
     void displayMonsterStats(std::vector <std::string>, int yVal);
+    void printInfo(std::string);
 };
 
 extern Console __console;

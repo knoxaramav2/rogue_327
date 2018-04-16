@@ -28,6 +28,8 @@ class Dungeon{
     Player * player;
     Entity ** npcs;
 
+    std::vector<Item> items;
+
     //debug states
     bool fogOfWar;
 };

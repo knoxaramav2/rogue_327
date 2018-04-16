@@ -545,6 +545,30 @@ void spawnPlayers(Dungeon * d){
     queueTurn(d->player, 100);
 }
 
+void spawnItems(Dungeon * d){
+    int numItems = randIn(10, 15);
+
+    //spawn items
+    for (int i = 0; i < numItems; ++i){
+        Item item(_itemReg.registry[randIn(0, _itemReg.registry.size()-1)]);
+
+        //place items
+        while(true){
+            int x = randIn(1, DUNGEON_WIDTH-1);
+            int y = randIn(1, DUNGEON_HEIGHT-1);
+            int cell = CELL(x,y);
+
+            if (getSymbol(d->screen[cell]) != ROCK_SPACE){
+                item.x = x;
+                item.y = y;
+                break;
+            }
+        }
+
+        d->items.push_back(item);
+    }
+}
+
 void updateTurn(Dungeon ** d){
     ++turn;
 
